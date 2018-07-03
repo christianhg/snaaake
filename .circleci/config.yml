@@ -33,10 +33,7 @@ jobs:
 
       # run tests!
       # - run: yarn test
-  deploy:
-    machine:
-      enabled: true
-    steps:
+
       - add_ssh_keys:
           fingerprints:
             - "72:1b:c9:33:ee:6e:7d:9a:b7:6f:a1:5a:72:a3:e0:e2"
@@ -46,14 +43,3 @@ jobs:
             tar -czf dist.tgz dist && \
             scp dist.tgz travis@37.139.24.127:/var/www/froke.dk && \
             ssh travis@37.139.24.127 'cd /var/www/froke.dk && tar zxvf dist.tgz -C .'
-workflows:
-  version: 2
-  build-and-deploy:
-    jobs:
-      - build
-      - deploy:
-          requires:
-            - build
-          filters:
-            branches:
-              only: master
