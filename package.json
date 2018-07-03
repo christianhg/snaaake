@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "dist": "parcel build --experimental-scope-hoisting index.html"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.9.4"
+  }
+}

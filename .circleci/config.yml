@@ -1,0 +1,59 @@
+version: 2
+jobs:
+  build:
+    docker:
+      # specify the version you desire here
+      - image: circleci/node:7.10
+
+      # Specify service dependencies here if necessary
+      # CircleCI maintains a library of pre-built images
+      # documented at https://circleci.com/docs/2.0/circleci-images/
+      # - image: circleci/mongo:3.4.4
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      # Download and cache dependencies
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
+
+      - run: yarn install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+      - run: yarn run dist
+
+      # run tests!
+      # - run: yarn test
+  deploy:
+    machine:
+      enabled: true
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "72:1b:c9:33:ee:6e:7d:9a:b7:6f:a1:5a:72:a3:e0:e2"
+      - run:
+          name: Deploy Over SSH
+          command: |
+            tar -czf dist.tgz dist && \
+            scp dist.tgz travis@37.139.24.127:/var/www/froke.dk && \
+            ssh travis@37.139.24.127 'cd /var/www/froke.dk && tar zxvf dist.tgz -C .'
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
