@@ -37,7 +37,7 @@ export const drawCircle = colorCircle => context => ({ coords, radius }) => {
   context.stroke()
 }
 
-const calculate = (step, circle) => {
+const update = (step, circle) => {
   return {
     ...circle,
     coords: {
@@ -47,16 +47,18 @@ const calculate = (step, circle) => {
   }
 }
 
-const draw = circle => {
+const render = circle => {
   clearCanvas(canvas, context, backgroundColor)
   drawCircle(() => '#ffffff')(context)(circle)
 }
 
+const initialScene = createCircle(5)({ x: 0, y: 0 })
+
 const startTimer = createTimer({
   step: 1 / 60,
-  update: calculate,
-  render: draw,
-  initialScene: createCircle(5)({ x: 0, y: 0 }),
+  update,
+  render,
+  initialScene,
 })
 
 document.addEventListener('click', startTimer)
