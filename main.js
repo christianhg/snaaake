@@ -52,19 +52,12 @@ const draw = circle => {
   drawCircle(() => '#ffffff')(context)(circle)
 }
 
-let circle = createCircle(5)({ x: 0, y: 0 })
-
-draw(circle)
-
-const update = step => {
-  circle = calculate(step, circle)
-}
-
-const render = () => {
-  draw(circle)
-}
-
-const startTimer = createTimer(1 / 60, update, render)
+const startTimer = createTimer(
+  1 / 60,
+  calculate,
+  draw,
+  createCircle(5)({ x: 0, y: 0 })
+)
 
 document.addEventListener('click', startTimer)
 

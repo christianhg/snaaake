@@ -1,7 +1,8 @@
-export const createTimer = (step, update, render) => () => {
+export const createTimer = (step, update, render, initialScene) => () => {
   let lastTime = 0
   let accumulator = 0
   let frameId
+  let scene = initialScene
 
   const animate = time => {
     if (lastTime) {
@@ -9,11 +10,11 @@ export const createTimer = (step, update, render) => () => {
       while (accumulator >= step) {
         accumulator = accumulator - step
 
-        update(step)
+        scene = update(step, scene)
       }
-
-      render()
     }
+
+    render(scene)
 
     lastTime = time
     frameId = requestAnimationFrame(animate)
