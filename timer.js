@@ -1,4 +1,4 @@
-export const createTimer = (step, update, render, initialScene) => () => {
+export const createTimer = ({ step, update, render, initialScene }) => () => {
   let lastTime = 0
   let accumulator = 0
   let frameId

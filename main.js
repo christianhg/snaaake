@@ -52,12 +52,12 @@ const draw = circle => {
   drawCircle(() => '#ffffff')(context)(circle)
 }
 
-const startTimer = createTimer(
-  1 / 60,
-  calculate,
-  draw,
-  createCircle(5)({ x: 0, y: 0 })
-)
+const startTimer = createTimer({
+  step: 1 / 60,
+  update: calculate,
+  render: draw,
+  initialScene: createCircle(5)({ x: 0, y: 0 }),
+})
 
 document.addEventListener('click', startTimer)
 
