@@ -1,0 +1,6 @@
+canvas {
+  background: #000000;
+  display: block;
+  image-rendering: pixelated;
+  margin: 0 auto;
+}
