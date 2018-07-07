@@ -6,18 +6,19 @@ import { createTimer } from './timer'
 
 const Vec = (x, y) => ({ x, y })
 
-const createCircle = radius => pos => ({
+const createCircle = radius => (pos, vel) => ({
   pos,
   radius,
+  vel,
 })
 
 const update = (step, circle) => {
   return {
     ...circle,
-    pos: {
-      x: circle.pos.x + step * 100,
-      y: circle.pos.y + step * 100,
-    },
+    pos: Vec(
+      circle.pos.x + circle.vel.x * step,
+      circle.pos.y + circle.vel.y * step
+    ),
   }
 }
 
@@ -26,7 +27,7 @@ class Froke extends Component {
     super()
 
     this.state = {
-      scene: createCircle(5)(Vec(0, 0)),
+      scene: createCircle(5)(Vec(0, 0), Vec(100, 100)),
     }
 
     this.startTimer = createTimer({
