@@ -12,11 +12,9 @@ const createCircle = radius => (pos, vel) => ({
   vel,
 })
 
-const createSquare = (A, B, C, D) => ({
+const createSquare = (A, C) => ({
   A,
-  B,
   C,
-  D,
 })
 
 const updateCircleVel = (circle, step, bounds) => ({
@@ -55,12 +53,7 @@ class Froke extends Component {
     this.state = {
       scene: {
         circle: createCircle(20)(Vec(320, 320), Vec(100, 50)),
-        bounds: createSquare(
-          Vec(0, 0),
-          Vec(640, 0),
-          Vec(640, 640),
-          Vec(0, 640)
-        ),
+        bounds: createSquare(Vec(0, 0), Vec(640, 640)),
       },
     }
 
