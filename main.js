@@ -1,10 +1,10 @@
 import 'modern-normalize'
 import { min } from 'ramda'
-import React from 'react'
+import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import { createTimer } from './timer'
 
-class Canvas extends React.Component {
+class Canvas extends Component {
   constructor(props) {
     super(props)
   }
@@ -62,7 +62,7 @@ const update = (step, circle) => {
   }
 }
 
-class Froke extends React.Component {
+class Froke extends Component {
   constructor() {
     super()
 
