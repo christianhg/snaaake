@@ -29,7 +29,7 @@ export class Canvas extends Component {
     context.clearRect(0, 0, canvas.width, canvas.height)
     context.fillStyle = '#000000'
 
-    drawCircle(() => '#ffffff')(context)(this.props.scene)
+    drawCircle(() => '#ffffff')(context)(this.props.scene.circle)
   }
 
   render() {

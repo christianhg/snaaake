@@ -12,13 +12,39 @@ const createCircle = radius => (pos, vel) => ({
   vel,
 })
 
-const update = (step, circle) => {
+const createSquare = (A, B, C, D) => ({
+  A,
+  B,
+  C,
+  D,
+})
+
+const updateCircleVel = (circle, step, bounds) => ({
+  ...circle,
+  vel: Vec(
+    updateCirclePos(circle, step).pos.x + circle.radius > bounds.C.x ||
+    updateCirclePos(circle, step).pos.x - circle.radius < 0
+      ? -circle.vel.x
+      : circle.vel.x,
+    updateCirclePos(circle, step).pos.y + circle.radius > bounds.C.y ||
+    updateCirclePos(circle, step).pos.y - circle.radius < 0
+      ? -circle.vel.y
+      : circle.vel.y
+  ),
+})
+
+const updateCirclePos = (circle, step) => ({
+  ...circle,
+  pos: Vec(
+    circle.pos.x + circle.vel.x * step,
+    circle.pos.y + circle.vel.y * step
+  ),
+})
+
+const update = (step, { circle, bounds }) => {
   return {
-    ...circle,
-    pos: Vec(
-      circle.pos.x + circle.vel.x * step,
-      circle.pos.y + circle.vel.y * step
-    ),
+    circle: updateCirclePos(updateCircleVel(circle, step, bounds), step),
+    bounds,
   }
 }
 
@@ -27,7 +53,15 @@ class Froke extends Component {
     super()
 
     this.state = {
-      scene: createCircle(5)(Vec(0, 0), Vec(100, 100)),
+      scene: {
+        circle: createCircle(20)(Vec(320, 320), Vec(100, 50)),
+        bounds: createSquare(
+          Vec(0, 0),
+          Vec(640, 0),
+          Vec(640, 640),
+          Vec(0, 640)
+        ),
+      },
     }
 
     this.startTimer = createTimer({
