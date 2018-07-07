@@ -9,14 +9,10 @@
   "babel": {
     "plugins": [
       "transform-object-rest-spread"
-    ],
-    "presets": [
-      "react-app"
     ]
   },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-react-app": "^3.1.2",
     "modern-normalize": "^0.5.0",
     "parcel-bundler": "^1.9.4",
     "prettier": "^1.13.7",
