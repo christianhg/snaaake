@@ -1,4 +1,5 @@
 {
+  "private": true,
   "scripts": {
     "dev": "trash .cache && parcel --no-hmr index.html",
     "dist": "trash dist && npm run prettier-production && parcel build --experimental-scope-hoisting index.html",
