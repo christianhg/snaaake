@@ -1,4 +1,3 @@
-import { min } from 'ramda'
 import React, { Component } from 'react'
 
 const drawCircle = colorCircle => context => ({ pos, radius }) => {
@@ -26,7 +25,12 @@ export class Canvas extends Component {
     const canvas = this.refs.canvas
     const context = canvas.getContext('2d')
 
-    context.clearRect(0, 0, canvas.width, canvas.height)
+    context.clearRect(
+      this.props.scene.bounds.A.x,
+      this.props.scene.bounds.A.y,
+      this.props.scene.bounds.C.x,
+      this.props.scene.bounds.C.y
+    )
     context.fillStyle = '#000000'
 
     drawCircle(() => '#ffffff')(context)(this.props.scene.circle)
@@ -36,8 +40,8 @@ export class Canvas extends Component {
     return (
       <canvas
         ref="canvas"
-        width={min(this.props.size, window.innerWidth)}
-        height={min(this.props.size, window.innerHeight)}
+        width={this.props.scene.bounds.C.x}
+        height={this.props.scene.bounds.C.y}
       />
     )
   }

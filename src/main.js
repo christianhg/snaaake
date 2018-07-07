@@ -76,7 +76,7 @@ class Froke extends Component {
     return (
       <div>
         <button onClick={() => this.startTimer()}>Start</button>
-        <Canvas size={640} scene={this.state.scene} />
+        <Canvas scene={this.state.scene} />
       </div>
     )
   }
