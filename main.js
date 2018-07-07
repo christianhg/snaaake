@@ -1,25 +1,40 @@
 import 'modern-normalize'
 import { min } from 'ramda'
+import React from 'react'
+import ReactDOM from 'react-dom'
 import { createTimer } from './timer'
 
-const createCanvas = size => {
-  const canvas = document.createElement('canvas')
-  const context = canvas.getContext('2d')
+class Canvas extends React.Component {
+  constructor(props) {
+    super(props)
+  }
 
-  canvas.width = min(size, window.innerWidth)
-  canvas.height = min(size, window.innerHeight)
+  componentDidMount() {
+    this.updateCanvas()
+  }
+  componentDidUpdate() {
+    this.updateCanvas()
+  }
 
-  return { canvas, context }
-}
+  updateCanvas() {
+    const canvas = this.refs.canvas
+    const context = canvas.getContext('2d')
 
-const { canvas, context } = createCanvas(640)
+    context.clearRect(0, 0, canvas.width, canvas.height)
+    context.fillStyle = '#000000'
 
-const backgroundColor = '#000000'
+    drawCircle(() => '#ffffff')(context)(this.props.scene)
+  }
 
-const clearCanvas = (canvas, context, backgroundColor) => {
-  context.clearRect(0, 0, canvas.width, canvas.height)
-  context.fillStyle = backgroundColor
-  context.fillRect(0, 0, canvas.width, canvas.height)
+  render() {
+    return (
+      <canvas
+        ref="canvas"
+        width={min(this.props.size, window.innerWidth)}
+        height={min(this.props.size, window.innerHeight)}
+      />
+    )
+  }
 }
 
 export const createCircle = radius => coords => ({
@@ -47,20 +62,30 @@ const update = (step, circle) => {
   }
 }
 
-const render = circle => {
-  clearCanvas(canvas, context, backgroundColor)
-  drawCircle(() => '#ffffff')(context)(circle)
+class Froke extends React.Component {
+  constructor() {
+    super()
+
+    this.state = {
+      scene: createCircle(5)({ x: 0, y: 0 }),
+    }
+
+    this.startTimer = createTimer({
+      step: 1 / 60,
+      update,
+      render: scene => this.setState({ scene }),
+      initialScene: this.state.scene,
+    })
+  }
+
+  render() {
+    return (
+      <div>
+        <button onClick={() => this.startTimer()}>Start</button>
+        <Canvas size={640} scene={this.state.scene} />
+      </div>
+    )
+  }
 }
 
-const initialScene = createCircle(5)({ x: 0, y: 0 })
-
-const startTimer = createTimer({
-  step: 1 / 60,
-  update,
-  render,
-  initialScene,
-})
-
-document.addEventListener('click', startTimer)
-
-document.body.appendChild(canvas)
+ReactDOM.render(<Froke />, document.getElementById('root'))
