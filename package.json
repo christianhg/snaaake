@@ -1,8 +1,8 @@
 {
   "private": true,
   "scripts": {
-    "dev": "trash .cache && parcel --no-hmr index.html",
-    "dist": "trash dist && npm run prettier-production && parcel build --experimental-scope-hoisting index.html",
+    "dev": "trash .cache && parcel --no-hmr src/index.html",
+    "dist": "trash dist && npm run prettier-production && parcel build --experimental-scope-hoisting src/index.html",
     "prettier": "prettier --write {*,**/*}.{css,js}",
     "prettier-production": "prettier --list-different {*,**/*}.{css,js}"
   },
