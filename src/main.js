@@ -23,11 +23,11 @@ const updateCircleVel = (circle, step, bounds) => ({
   ...circle,
   vel: Vec(
     updateCirclePos(circle, step).pos.x + circle.radius > bounds.C.x ||
-    updateCirclePos(circle, step).pos.x - circle.radius < 0
+    updateCirclePos(circle, step).pos.x - circle.radius < bounds.A.x
       ? -circle.vel.x
       : circle.vel.x,
     updateCirclePos(circle, step).pos.y + circle.radius > bounds.C.y ||
-    updateCirclePos(circle, step).pos.y - circle.radius < 0
+    updateCirclePos(circle, step).pos.y - circle.radius < bounds.A.y
       ? -circle.vel.y
       : circle.vel.y
   ),
