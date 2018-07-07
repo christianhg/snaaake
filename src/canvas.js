@@ -1,11 +1,11 @@
 import { min } from 'ramda'
 import React, { Component } from 'react'
 
-const drawCircle = colorCircle => context => ({ coords, radius }) => {
-  context.strokeStyle = colorCircle({ coords, radius })
+const drawCircle = colorCircle => context => ({ pos, radius }) => {
+  context.strokeStyle = colorCircle({ pos, radius })
   context.beginPath()
   context.lineWidth = 2
-  context.arc(coords.x, coords.y, radius - 1, 0, Math.PI * 2)
+  context.arc(pos.x, pos.y, radius - 1, 0, Math.PI * 2)
   context.closePath()
   context.stroke()
 }

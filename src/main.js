@@ -4,17 +4,19 @@ import ReactDOM from 'react-dom'
 import { Canvas } from './canvas'
 import { createTimer } from './timer'
 
-const createCircle = radius => coords => ({
-  coords,
+const Vec = (x, y) => ({ x, y })
+
+const createCircle = radius => pos => ({
+  pos,
   radius,
 })
 
 const update = (step, circle) => {
   return {
     ...circle,
-    coords: {
-      x: circle.coords.x + step * 100,
-      y: circle.coords.y + step * 100,
+    pos: {
+      x: circle.pos.x + step * 100,
+      y: circle.pos.y + step * 100,
     },
   }
 }
@@ -24,7 +26,7 @@ class Froke extends Component {
     super()
 
     this.state = {
-      scene: createCircle(5)({ x: 0, y: 0 }),
+      scene: createCircle(5)(Vec(0, 0)),
     }
 
     this.startTimer = createTimer({
