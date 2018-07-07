@@ -2,42 +2,14 @@ import 'modern-normalize'
 import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import { Canvas } from './canvas'
+import { Vec } from './math'
+import {
+  createCircle,
+  createSquare,
+  updateCirclePos,
+  updateCircleVel,
+} from './shapes'
 import { createTimer } from './timer'
-
-const Vec = (x, y) => ({ x, y })
-
-const createCircle = (radius, pos, vel) => ({
-  pos,
-  radius,
-  vel,
-})
-
-const createSquare = (A, C) => ({
-  A,
-  C,
-})
-
-const updateCircleVel = (circle, step, bounds) => ({
-  ...circle,
-  vel: Vec(
-    updateCirclePos(circle, step).pos.x + circle.radius > bounds.C.x ||
-    updateCirclePos(circle, step).pos.x - circle.radius < bounds.A.x
-      ? -circle.vel.x
-      : circle.vel.x,
-    updateCirclePos(circle, step).pos.y + circle.radius > bounds.C.y ||
-    updateCirclePos(circle, step).pos.y - circle.radius < bounds.A.y
-      ? -circle.vel.y
-      : circle.vel.y
-  ),
-})
-
-const updateCirclePos = (circle, step) => ({
-  ...circle,
-  pos: Vec(
-    circle.pos.x + circle.vel.x * step,
-    circle.pos.y + circle.vel.y * step
-  ),
-})
 
 const update = (step, { circle, bounds }) => {
   return {
