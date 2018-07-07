@@ -7,7 +7,6 @@ import { createTimer } from './timer'
 const createCircle = radius => coords => ({
   coords,
   radius,
-  type: 'CIRCLE',
 })
 
 const update = (step, circle) => {
