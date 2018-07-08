@@ -29,9 +29,17 @@ const gameMachine = Machine({
     },
     running: {
       on: {
+        PAUSE: 'paused',
         STOP: 'stopped',
       },
       onEntry: 'startGame',
+    },
+    paused: {
+      on: {
+        RESUME: 'running',
+        STOP: 'stopped',
+      },
+      onEntry: 'pauseGame',
     },
     stopped: {
       on: {
@@ -51,13 +59,26 @@ class Froke extends Component {
       bounds: createSquare(Vec(0, 0), Vec(640, 640)),
     }
 
+    const getStartTimer = initialScene =>
+      createTimer({
+        step: 1 / 60,
+        update,
+        render: scene => this.setState({ scene }),
+        initialScene,
+      })
+
     this.actionMap = {
       startGame: () => {
         this.stopTimer = this.startTimer()
       },
+      pauseGame: () => {
+        this.stopTimer()
+        this.startTimer = getStartTimer(this.state.scene)
+      },
       stopGame: () => {
         this.stopTimer()
         this.setState({ scene: initialScene })
+        this.startTimer = getStartTimer(initialScene)
       },
     }
 
@@ -66,12 +87,7 @@ class Froke extends Component {
       scene: initialScene,
     }
 
-    this.startTimer = createTimer({
-      step: 1 / 60,
-      update,
-      render: scene => this.setState({ scene }),
-      initialScene: this.state.scene,
-    })
+    this.startTimer = getStartTimer(initialScene)
   }
 
   dispatch(event) {
@@ -104,6 +120,20 @@ class Froke extends Component {
           undefined
         )}
         {this.state.game === 'running' ? (
+          <button onClick={() => this.dispatch({ type: 'PAUSE' })}>
+            Pause
+          </button>
+        ) : (
+          undefined
+        )}
+        {this.state.game === 'paused' ? (
+          <button onClick={() => this.dispatch({ type: 'RESUME' })}>
+            Resume
+          </button>
+        ) : (
+          undefined
+        )}
+        {this.state.game === 'running' || this.state.game === 'paused' ? (
           <button onClick={() => this.dispatch({ type: 'STOP' })}>Stop</button>
         ) : (
           undefined
