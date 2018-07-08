@@ -46,21 +46,24 @@ class Froke extends Component {
   constructor() {
     super()
 
+    const initialScene = {
+      circle: createCircle(20, Vec(320, 320), Vec(100, 50)),
+      bounds: createSquare(Vec(0, 0), Vec(640, 640)),
+    }
+
     this.actionMap = {
       startGame: () => {
         this.stopTimer = this.startTimer()
       },
       stopGame: () => {
         this.stopTimer()
+        this.setState({ scene: initialScene })
       },
     }
 
     this.state = {
       game: gameMachine.initialState.value,
-      scene: {
-        circle: createCircle(20, Vec(320, 320), Vec(100, 50)),
-        bounds: createSquare(Vec(0, 0), Vec(640, 640)),
-      },
+      scene: initialScene,
     }
 
     this.startTimer = createTimer({
