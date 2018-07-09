@@ -1,20 +1,37 @@
 export const bindKeys = (element, bindings) => {
   const keyStates = new Map()
+  const isDown = key => keyStates.get(key) === 'keydown'
+  const siblingsPressed = (keys, pressedKey) =>
+    keys
+      .filter(key => key !== pressedKey)
+      .filter(key => keyStates.get(key) === 'keydown').length > 0
 
   const keydown = event => {
-    bindings.forEach(({ down }, key) => {
-      if (key === event.key && keyStates.get(key) !== 'keydown') {
+    bindings.forEach(({ down }, keys) => {
+      const keyPressed = keys.find(key => key === event.key)
+
+      if (
+        keyPressed &&
+        !siblingsPressed(keys, keyPressed) &&
+        !isDown(keyPressed)
+      ) {
         down()
-        keyStates.set(key, 'keydown')
+        keyStates.set(keyPressed, 'keydown')
       }
     })
   }
 
   const keyup = event => {
-    bindings.forEach(({ up }, key) => {
-      if (key === event.key && keyStates.get(key) !== 'keyup') {
+    bindings.forEach(({ up }, keys) => {
+      const keyPressed = keys.find(key => key === event.key)
+
+      if (
+        keyPressed &&
+        !siblingsPressed(keys, keyPressed) &&
+        isDown(keyPressed)
+      ) {
         up()
-        keyStates.set(key, 'keyup')
+        keyStates.set(keyPressed, 'keyup')
       }
     })
   }

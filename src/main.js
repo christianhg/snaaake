@@ -77,28 +77,28 @@ class Froke extends Component {
           window,
           new Map([
             [
-              'ArrowUp',
+              ['w', 'ArrowUp'],
               {
                 down: () => console.log('up-down'),
                 up: () => console.log('up-up'),
               },
             ],
             [
-              'ArrowRight',
+              ['d', 'ArrowRight'],
               {
                 down: () => console.log('right-down'),
                 up: () => console.log('right-up'),
               },
             ],
             [
-              'ArrowDown',
+              ['s', 'ArrowDown'],
               {
                 down: () => console.log('down-down'),
                 up: () => console.log('down-up'),
               },
             ],
             [
-              'ArrowLeft',
+              ['a', 'ArrowLeft'],
               {
                 down: () => console.log('left-down'),
                 up: () => console.log('left-up'),
