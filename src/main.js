@@ -3,6 +3,7 @@ import React, { Component } from 'react'
 import ReactDOM from 'react-dom'
 import { Machine } from 'xstate'
 import { Canvas } from './canvas'
+import { bindKeys } from './keyboard'
 import { Vec } from './math'
 import {
   createCircle,
@@ -67,9 +68,44 @@ class Froke extends Component {
         initialScene,
       })
 
+    let unbindKeys
+
     this.actionMap = {
       startGame: () => {
         this.stopTimer = this.startTimer()
+        unbindKeys = bindKeys(
+          window,
+          new Map([
+            [
+              'ArrowUp',
+              {
+                down: () => console.log('up-down'),
+                up: () => console.log('up-up'),
+              },
+            ],
+            [
+              'ArrowRight',
+              {
+                down: () => console.log('right-down'),
+                up: () => console.log('right-up'),
+              },
+            ],
+            [
+              'ArrowDown',
+              {
+                down: () => console.log('down-down'),
+                up: () => console.log('down-up'),
+              },
+            ],
+            [
+              'ArrowLeft',
+              {
+                down: () => console.log('left-down'),
+                up: () => console.log('left-up'),
+              },
+            ],
+          ])
+        )
       },
       pauseGame: () => {
         this.stopTimer()
@@ -79,6 +115,7 @@ class Froke extends Component {
         this.stopTimer()
         this.setState({ scene: initialScene })
         this.startTimer = getStartTimer(initialScene)
+        unbindKeys()
       },
     }
 
