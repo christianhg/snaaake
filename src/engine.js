@@ -53,7 +53,7 @@ export const createEngine = ({
       while (accumulatedTime >= step) {
         accumulatedTime = accumulatedTime - step
 
-        state = tick(step, state)
+        state = tick(state, step)
       }
     }
 

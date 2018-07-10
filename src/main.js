@@ -11,7 +11,7 @@ import {
   updateCircleVel,
 } from './shapes'
 
-const update = (step, { circle, bounds }) => {
+const tick = ({ circle, bounds }, step) => {
   return {
     circle: updateCirclePos(updateCircleVel(circle, step, bounds), step),
     bounds,
@@ -24,7 +24,7 @@ class Froke extends Component {
 
     this.engine = createEngine({
       step: 1 / 60,
-      tick: update,
+      tick,
       subscribe: ({ state, status }) =>
         this.setState({ game: { state, status } }),
       initialState: {
