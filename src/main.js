@@ -11,12 +11,10 @@ import {
   updateCircleVel,
 } from './shapes'
 
-const tick = ({ circle, bounds }, step) => {
-  return {
-    circle: updateCirclePos(updateCircleVel(circle, step, bounds), step),
-    bounds,
-  }
-}
+const tick = (state, step) => ({
+  ...state,
+  circle: updateCirclePos(updateCircleVel(state, step), step),
+})
 
 class Froke extends Component {
   constructor() {

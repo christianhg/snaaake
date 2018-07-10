@@ -11,7 +11,7 @@ export const createSquare = (A, C) => ({
   C,
 })
 
-export const updateCircleVel = (circle, step, bounds) => ({
+export const updateCircleVel = ({ bounds, circle }, step) => ({
   ...circle,
   vel: Vec(
     updateCirclePos(circle, step).pos.x + circle.radius > bounds.C.x ||
