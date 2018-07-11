@@ -37,7 +37,7 @@ export const createEngine = ({
   tick,
   subscribe,
   initialState,
-  keyBindings,
+  keyBindings: { element, bindings },
 }) => {
   let status = engineMachine.initialState.value
   let state = initialState
@@ -66,7 +66,7 @@ export const createEngine = ({
   const actionMap = {
     startEngine: () => {
       frameId = requestAnimationFrame(animate)
-      unbind = bindKeys(keyBindings.element, keyBindings.bindings)
+      unbind = bindKeys({ element, bindings, getState, setState })
     },
     pauseEngine: () => {
       lastTime = 0
@@ -97,8 +97,13 @@ export const createEngine = ({
     subscribe({ status, state })
   }
 
+  const getState = () => state
+  const setState = newState => {
+    state = newState
+  }
+
   return {
-    getState: () => state,
+    getState,
     getStatus: () => status,
     start() {
       dispatch({ type: 'START' })

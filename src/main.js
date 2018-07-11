@@ -35,29 +35,53 @@ class Froke extends Component {
           [
             ['w', 'ArrowUp'],
             {
-              down: () => console.log('up-down'),
-              up: () => console.log('up-up'),
+              down: state => {
+                console.log('up-down')
+                return state
+              },
+              up: state => {
+                console.log('up-up')
+                return state
+              },
             },
           ],
           [
             ['d', 'ArrowRight'],
             {
-              down: () => console.log('right-down'),
-              up: () => console.log('right-up'),
+              down: state => {
+                console.log('right-down')
+                return state
+              },
+              up: state => {
+                console.log('right-up')
+                return state
+              },
             },
           ],
           [
             ['s', 'ArrowDown'],
             {
-              down: () => console.log('down-down'),
-              up: () => console.log('down-up'),
+              down: state => {
+                console.log('down-down')
+                return state
+              },
+              up: state => {
+                console.log('down-up')
+                return state
+              },
             },
           ],
           [
             ['a', 'ArrowLeft'],
             {
-              down: () => console.log('left-down'),
-              up: () => console.log('left-up'),
+              down: state => {
+                console.log('left-down')
+                return state
+              },
+              up: state => {
+                console.log('left-up')
+                return state
+              },
             },
           ],
         ]),

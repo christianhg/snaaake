@@ -1,4 +1,4 @@
-export const bindKeys = (element, bindings) => {
+export const bindKeys = ({ element, bindings, getState, setState }) => {
   const keyStates = new Map()
   const isDown = key => keyStates.get(key) === 'keydown'
   const siblingsPressed = (keys, pressedKey) =>
@@ -15,7 +15,7 @@ export const bindKeys = (element, bindings) => {
         !siblingsPressed(keys, keyPressed) &&
         !isDown(keyPressed)
       ) {
-        down()
+        setState(down(getState()))
         keyStates.set(keyPressed, 'keydown')
       }
     })
@@ -30,7 +30,7 @@ export const bindKeys = (element, bindings) => {
         !siblingsPressed(keys, keyPressed) &&
         isDown(keyPressed)
       ) {
-        up()
+        setState(up(getState()))
         keyStates.set(keyPressed, 'keyup')
       }
     })
