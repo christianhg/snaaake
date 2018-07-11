@@ -104,27 +104,19 @@ class Froke extends Component {
         <p>
           Current status: <b>{this.state.game.status}</b>
         </p>
-        {this.state.game.status === 'idle' ||
-        this.state.game.status === 'stopped' ? (
+        {(this.state.game.status === 'idle' ||
+          this.state.game.status === 'stopped') && (
           <button onClick={() => this.engine.start()}>Start</button>
-        ) : (
-          undefined
         )}
-        {this.state.game.status === 'running' ? (
+        {this.state.game.status === 'running' && (
           <button onClick={() => this.engine.pause()}>Pause</button>
-        ) : (
-          undefined
         )}
-        {this.state.game.status === 'paused' ? (
+        {this.state.game.status === 'paused' && (
           <button onClick={() => this.engine.resume()}>Resume</button>
-        ) : (
-          undefined
         )}
-        {this.state.game.status === 'running' ||
-        this.state.game.status === 'paused' ? (
+        {(this.state.game.status === 'running' ||
+          this.state.game.status === 'paused') && (
           <button onClick={() => this.engine.stop()}>Stop</button>
-        ) : (
-          undefined
         )}
         <Canvas scene={this.state.game.state} />
       </div>
