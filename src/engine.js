@@ -1,5 +1,6 @@
 import { Machine } from 'xstate'
 import { bindKeys } from './keyboard'
+import { createTimer } from './timer'
 
 const engineMachine = Machine({
   initial: 'idle',
@@ -39,44 +40,37 @@ export const createEngine = ({
   initialState,
   keyBindings: { element, bindings },
 }) => {
+  const getState = () => state
+  const setState = newState => {
+    state = newState
+  }
+
   let status = engineMachine.initialState.value
   let state = initialState
-  let lastTime = 0
-  let accumulatedTime = 0
-  let frameId
   let unbind
-
-  const animate = time => {
-    if (lastTime) {
-      accumulatedTime = accumulatedTime + (time - lastTime) / 1000
-
-      while (accumulatedTime >= step) {
-        accumulatedTime = accumulatedTime - step
-
-        state = tick(state, step)
-      }
-    }
-
-    subscribe({ status, state })
-
-    lastTime = time
-    frameId = requestAnimationFrame(animate)
-  }
+  let startTimer = createTimer({
+    step,
+    tick,
+    getState,
+    setState: newState => {
+      state = newState
+      subscribe({ status, state })
+    },
+  })
+  let stopTimer
 
   const actionMap = {
     startEngine: () => {
-      frameId = requestAnimationFrame(animate)
+      stopTimer = startTimer()
       unbind = bindKeys({ element, bindings, getState, setState })
     },
     pauseEngine: () => {
-      lastTime = 0
-      cancelAnimationFrame(frameId)
+      stopTimer()
       unbind()
     },
     stopEngine: () => {
-      lastTime = 0
       state = initialState
-      cancelAnimationFrame(frameId)
+      stopTimer()
       unbind()
     },
   }
@@ -95,11 +89,6 @@ export const createEngine = ({
     status = nextStatus.value
 
     subscribe({ status, state })
-  }
-
-  const getState = () => state
-  const setState = newState => {
-    state = newState
   }
 
   return {
