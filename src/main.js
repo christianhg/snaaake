@@ -16,6 +16,8 @@ const tick = (state, step) => ({
   circle: updateCirclePos(updateCircleVel(state, step), step),
 })
 
+const identity = x => x
+
 class Froke extends Component {
   constructor() {
     super()
@@ -26,7 +28,7 @@ class Froke extends Component {
       subscribe: ({ state, status }) =>
         this.setState({ game: { state, status } }),
       initialState: {
-        circle: createCircle(20, Vec(320, 320), Vec(100, 50)),
+        circle: createCircle(20, Vec(320, 320), Vec(0, 0)),
         bounds: createSquare(Vec(0, 0), Vec(640, 640)),
       },
       keyBindings: {
@@ -35,53 +37,53 @@ class Froke extends Component {
           [
             ['w', 'ArrowUp'],
             {
-              down: state => {
-                console.log('up-down')
-                return state
-              },
-              up: state => {
-                console.log('up-up')
-                return state
-              },
+              down: state => ({
+                ...state,
+                circle: {
+                  ...state.circle,
+                  vel: Vec(state.circle.vel.x, state.circle.vel.y - 1),
+                },
+              }),
+              up: identity,
             },
           ],
           [
             ['d', 'ArrowRight'],
             {
-              down: state => {
-                console.log('right-down')
-                return state
-              },
-              up: state => {
-                console.log('right-up')
-                return state
-              },
+              down: state => ({
+                ...state,
+                circle: {
+                  ...state.circle,
+                  vel: Vec(state.circle.vel.x + 1, state.circle.vel.y),
+                },
+              }),
+              up: identity,
             },
           ],
           [
             ['s', 'ArrowDown'],
             {
-              down: state => {
-                console.log('down-down')
-                return state
-              },
-              up: state => {
-                console.log('down-up')
-                return state
-              },
+              down: state => ({
+                ...state,
+                circle: {
+                  ...state.circle,
+                  vel: Vec(state.circle.vel.x, state.circle.vel.y + 1),
+                },
+              }),
+              up: identity,
             },
           ],
           [
             ['a', 'ArrowLeft'],
             {
-              down: state => {
-                console.log('left-down')
-                return state
-              },
-              up: state => {
-                console.log('left-up')
-                return state
-              },
+              down: state => ({
+                ...state,
+                circle: {
+                  ...state.circle,
+                  vel: Vec(state.circle.vel.x - 1, state.circle.vel.y),
+                },
+              }),
+              up: identity,
             },
           ],
         ]),
