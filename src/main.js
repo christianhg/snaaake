@@ -1,26 +1,26 @@
-import 'modern-normalize'
-import React, { Component } from 'react'
-import ReactDOM from 'react-dom'
-import { Canvas } from './canvas'
-import { createEngine } from './engine'
-import { Vec } from './math'
+import 'modern-normalize';
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+import { Canvas } from './canvas';
+import { createEngine } from './engine';
+import { Vec } from './math';
 import {
   createCircle,
   createSquare,
   updateCirclePos,
   updateCircleVel,
-} from './shapes'
+} from './shapes';
 
 const tick = (state, step) => ({
   ...state,
   circle: updateCirclePos(updateCircleVel(state, step), step),
-})
+});
 
-const identity = x => x
+const identity = x => x;
 
 class Froke extends Component {
   constructor() {
-    super()
+    super();
 
     this.engine = createEngine({
       step: 1 / 60,
@@ -88,14 +88,14 @@ class Froke extends Component {
           ],
         ]),
       },
-    })
+    });
 
     this.state = {
       game: {
         state: this.engine.getState(),
         status: this.engine.getStatus(),
       },
-    }
+    };
   }
 
   render() {
@@ -120,8 +120,8 @@ class Froke extends Component {
         )}
         <Canvas scene={this.state.game.state} />
       </div>
-    )
+    );
   }
 }
 
-ReactDOM.render(<Froke />, document.getElementById('root'))
+ReactDOM.render(<Froke />, document.getElementById('root'));

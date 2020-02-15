@@ -1,15 +1,15 @@
-import { Vec } from './math'
+import { Vec } from './math';
 
 export const createCircle = (radius, pos, vel) => ({
   pos,
   radius,
   vel,
-})
+});
 
 export const createSquare = (A, C) => ({
   A,
   C,
-})
+});
 
 export const updateCircleVel = ({ bounds, circle }, step) => ({
   ...circle,
@@ -23,7 +23,7 @@ export const updateCircleVel = ({ bounds, circle }, step) => ({
       ? -circle.vel.y
       : circle.vel.y
   ),
-})
+});
 
 export const updateCirclePos = (circle, step) => ({
   ...circle,
@@ -31,4 +31,4 @@ export const updateCirclePos = (circle, step) => ({
     circle.pos.x + circle.vel.x * step,
     circle.pos.y + circle.vel.y * step
   ),
-})
+});

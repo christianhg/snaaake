@@ -1,1 +1,1 @@
-export const Vec = (x, y) => ({ x, y })
+export const Vec = (x, y) => ({ x, y });

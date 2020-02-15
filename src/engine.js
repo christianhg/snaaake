@@ -1,6 +1,6 @@
-import { Machine } from 'xstate'
-import { bindKeys } from './keyboard'
-import { createTimer } from './timer'
+import { Machine } from 'xstate';
+import { bindKeys } from './keyboard';
+import { createTimer } from './timer';
 
 const engineMachine = Machine({
   initial: 'idle',
@@ -31,7 +31,7 @@ const engineMachine = Machine({
       onEntry: 'stopEngine',
     },
   },
-})
+});
 
 export const createEngine = ({
   step,
@@ -40,71 +40,71 @@ export const createEngine = ({
   initialState,
   keyBindings: { element, bindings },
 }) => {
-  const getState = () => state
+  const getState = () => state;
   const setState = newState => {
-    state = newState
-  }
+    state = newState;
+  };
 
-  let status = engineMachine.initialState.value
-  let state = initialState
-  let unbind
+  let status = engineMachine.initialState.value;
+  let state = initialState;
+  let unbind;
   let startTimer = createTimer({
     step,
     tick,
     getState,
     setState: newState => {
-      state = newState
-      subscribe({ status, state })
+      state = newState;
+      subscribe({ status, state });
     },
-  })
-  let stopTimer
+  });
+  let stopTimer;
 
   const actionMap = {
     startEngine: () => {
-      stopTimer = startTimer()
-      unbind = bindKeys({ element, bindings, getState, setState })
+      stopTimer = startTimer();
+      unbind = bindKeys({ element, bindings, getState, setState });
     },
     pauseEngine: () => {
-      stopTimer()
-      unbind()
+      stopTimer();
+      unbind();
     },
     stopEngine: () => {
-      state = initialState
-      stopTimer()
-      unbind()
+      state = initialState;
+      stopTimer();
+      unbind();
     },
-  }
+  };
 
   const dispatch = event => {
-    const nextStatus = engineMachine.transition(status, event)
+    const nextStatus = engineMachine.transition(status, event);
 
     nextStatus.actions.forEach(actionKey => {
-      const action = actionMap[actionKey]
+      const action = actionMap[actionKey];
 
       if (action) {
-        action(event)
+        action(event);
       }
-    })
+    });
 
-    status = nextStatus.value
+    status = nextStatus.value;
 
-    subscribe({ status, state })
-  }
+    subscribe({ status, state });
+  };
 
   return {
     getState,
     getStatus: () => status,
     start() {
-      dispatch({ type: 'START' })
+      dispatch({ type: 'START' });
     },
     pause() {
-      dispatch({ type: 'PAUSE' })
+      dispatch({ type: 'PAUSE' });
     },
     resume() {
-      dispatch({ type: 'RESUME' })
+      dispatch({ type: 'RESUME' });
     },
     stop() {
-      dispatch({ type: 'STOP' })
+      dispatch({ type: 'STOP' });
     },
-  }
-}
+  };
+};

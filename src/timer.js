@@ -1,29 +1,29 @@
 export const createTimer = ({ step, tick, getState, setState }) => () => {
-  let lastTime = 0
-  let accumulatedTime = 0
-  let frameId
-  let state = getState()
+  let lastTime = 0;
+  let accumulatedTime = 0;
+  let frameId;
+  let state = getState();
 
   const animate = time => {
-    state = getState()
+    state = getState();
 
     if (lastTime) {
-      accumulatedTime = accumulatedTime + (time - lastTime) / 1000
+      accumulatedTime = accumulatedTime + (time - lastTime) / 1000;
 
       while (accumulatedTime >= step) {
-        accumulatedTime = accumulatedTime - step
+        accumulatedTime = accumulatedTime - step;
 
-        state = tick(state, step)
+        state = tick(state, step);
       }
     }
 
-    setState(state)
+    setState(state);
 
-    lastTime = time
-    frameId = requestAnimationFrame(animate)
-  }
+    lastTime = time;
+    frameId = requestAnimationFrame(animate);
+  };
 
-  frameId = requestAnimationFrame(animate)
+  frameId = requestAnimationFrame(animate);
 
-  return () => cancelAnimationFrame(frameId)
-}
+  return () => cancelAnimationFrame(frameId);
+};
