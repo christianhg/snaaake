@@ -1,6 +1,5 @@
 import 'modern-normalize';
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import { Canvas } from './canvas';
 import { createEngine } from './engine';
 import { Vec } from './math';
@@ -18,7 +17,7 @@ const tick = (state, step) => ({
 
 const identity = x => x;
 
-class Froke extends Component {
+export class Snaaake extends Component {
   constructor() {
     super();
 
@@ -123,5 +122,3 @@ class Froke extends Component {
     );
   }
 }
-
-ReactDOM.render(<Froke />, document.getElementById('root'));
