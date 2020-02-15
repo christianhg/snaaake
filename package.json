@@ -3,8 +3,8 @@
   "scripts": {
     "dev": "trash .cache && parcel --no-hmr src/index.html",
     "dist": "trash dist && npm run prettier-production && parcel build src/index.html",
-    "prettier": "prettier --write {*,**/*}.{css,js}",
-    "prettier-production": "prettier --list-different {*,**/*}.{css,js}"
+    "prettier": "prettier --write {*,**/*}.{css,html,js}",
+    "prettier-production": "prettier --list-different {*,**/*}.{css,html,js}"
   },
   "devDependencies": {
     "modern-normalize": "^0.6.0",
