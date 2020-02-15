@@ -17,8 +17,8 @@
     "parcel-bundler": "^1.9.4",
     "prettier": "^1.19.1",
     "ramda": "^0.25.0",
-    "react": "^16.4.1",
-    "react-dom": "^16.4.1",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
     "trash-cli": "^1.4.0",
     "xstate": "^4.7.8"
   }
