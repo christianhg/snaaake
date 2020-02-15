@@ -13,13 +13,13 @@
   },
   "devDependencies": {
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "modern-normalize": "^0.5.0",
+    "modern-normalize": "^0.6.0",
     "parcel-bundler": "^1.9.4",
     "prettier": "^1.19.1",
-    "ramda": "^0.25.0",
+    "ramda": "^0.27.0",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "trash-cli": "^1.4.0",
+    "trash-cli": "^3.0.0",
     "xstate": "^4.7.8"
   }
 }
