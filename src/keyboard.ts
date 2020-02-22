@@ -1,12 +1,29 @@
-export const bindKeys = ({ element, bindings, getState, setState }) => {
-  const keyStates = new Map();
-  const isDown = key => keyStates.get(key) === 'keydown';
-  const siblingsPressed = (keys, pressedKey) =>
+export type Key = string;
+
+export type KeyEvents<State> = {
+  down: (state: State) => State;
+  up: (state: State) => State;
+};
+
+export const bindKeys = <State>({
+  element,
+  bindings,
+  getState,
+  setState,
+}: {
+  element: Window;
+  bindings: Map<Key[], KeyEvents<State>>;
+  getState: () => State;
+  setState: (state: State) => void;
+}) => {
+  const keyStates = new Map<Key, 'keyup' | 'keydown'>();
+  const isDown = (key: Key) => keyStates.get(key) === 'keydown';
+  const siblingsPressed = (keys: Key[], pressedKey: Key) =>
     keys
       .filter(key => key !== pressedKey)
       .filter(key => keyStates.get(key) === 'keydown').length > 0;
 
-  const keydown = event => {
+  const keydown = (event: KeyboardEvent) => {
     bindings.forEach(({ down }, keys) => {
       const keyPressed = keys.find(key => key === event.key);
 
@@ -21,7 +38,7 @@ export const bindKeys = ({ element, bindings, getState, setState }) => {
     });
   };
 
-  const keyup = event => {
+  const keyup = (event: KeyboardEvent) => {
     bindings.forEach(({ up }, keys) => {
       const keyPressed = keys.find(key => key === event.key);
 

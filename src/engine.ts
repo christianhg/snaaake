@@ -1,5 +1,5 @@
 import { Machine, StateSchema, StateValue } from 'xstate';
-import { bindKeys } from './keyboard';
+import { bindKeys, Key, KeyEvents } from './keyboard';
 import { createTimer } from './timer';
 
 interface EngineSchema extends StateSchema {
@@ -48,13 +48,6 @@ const engineMachine = Machine<undefined, EngineSchema, EngineEvent>({
   },
 });
 
-type Keys = string[];
-
-type KeyEvents<State> = {
-  down: (state: State) => State;
-  up: (state: State) => State;
-};
-
 export const createEngine = <State>({
   step,
   tick,
@@ -66,7 +59,7 @@ export const createEngine = <State>({
   tick: (state: State, step: number) => State;
   subscribe: ({ state, status }: { state: State; status: StateValue }) => void;
   initialState: State;
-  keyBindings: { element: any; bindings: Map<Keys, KeyEvents<State>> };
+  keyBindings: { element: Window; bindings: Map<Key[], KeyEvents<State>> };
 }) => {
   const getState = () => state;
   const setState = (newState: State) => {
