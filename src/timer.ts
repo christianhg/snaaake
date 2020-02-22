@@ -1,4 +1,4 @@
-type Timer = () => void;
+type Timer = () => () => void;
 
 export const createTimer = <State>({
   step,
