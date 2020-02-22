@@ -2,7 +2,7 @@ import 'modern-normalize';
 import React, { Component } from 'react';
 import { Canvas } from './canvas';
 import { createEngine } from './engine';
-import { Vec } from './math';
+import { createVec } from './math';
 import {
   createCircle,
   createSquare,
@@ -27,8 +27,8 @@ export class Snaaake extends Component {
       subscribe: ({ state, status }) =>
         this.setState({ game: { state, status } }),
       initialState: {
-        circle: createCircle(20, Vec(320, 320), Vec(0, 0)),
-        bounds: createSquare(Vec(0, 0), Vec(640, 640)),
+        circle: createCircle(20, createVec(320, 320), createVec(0, 0)),
+        bounds: createSquare(createVec(0, 0), createVec(640, 640)),
       },
       keyBindings: {
         element: window,
@@ -40,7 +40,7 @@ export class Snaaake extends Component {
                 ...state,
                 circle: {
                   ...state.circle,
-                  vel: Vec(state.circle.vel.x, state.circle.vel.y - 1),
+                  vel: createVec(state.circle.vel.x, state.circle.vel.y - 1),
                 },
               }),
               up: identity,
@@ -53,7 +53,7 @@ export class Snaaake extends Component {
                 ...state,
                 circle: {
                   ...state.circle,
-                  vel: Vec(state.circle.vel.x + 1, state.circle.vel.y),
+                  vel: createVec(state.circle.vel.x + 1, state.circle.vel.y),
                 },
               }),
               up: identity,
@@ -66,7 +66,7 @@ export class Snaaake extends Component {
                 ...state,
                 circle: {
                   ...state.circle,
-                  vel: Vec(state.circle.vel.x, state.circle.vel.y + 1),
+                  vel: createVec(state.circle.vel.x, state.circle.vel.y + 1),
                 },
               }),
               up: identity,
@@ -79,7 +79,7 @@ export class Snaaake extends Component {
                 ...state,
                 circle: {
                   ...state.circle,
-                  vel: Vec(state.circle.vel.x - 1, state.circle.vel.y),
+                  vel: createVec(state.circle.vel.x - 1, state.circle.vel.y),
                 },
               }),
               up: identity,

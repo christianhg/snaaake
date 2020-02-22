@@ -1,19 +1,45 @@
-import { Vec } from './math';
+import { createVec, Vec } from './math';
 
-export const createCircle = (radius, pos, vel) => ({
+type Pos = {
+  x: number;
+  y: number;
+};
+
+type Circle = {
+  pos: Pos;
+  radius: number;
+  vel: Vec;
+};
+
+export const createCircle = (radius: number, pos: Pos, vel: Vec): Circle => ({
   pos,
   radius,
   vel,
 });
 
-export const createSquare = (A, C) => ({
+type Square = {
+  A: Pos;
+  C: Pos;
+};
+
+export const createSquare = (A: Pos, C: Pos): Square => ({
   A,
   C,
 });
 
-export const updateCircleVel = ({ bounds, circle }, step) => ({
+type Bounds = {
+  A: Pos;
+  B: Pos;
+  C: Pos;
+  D: Pos;
+};
+
+export const updateCircleVel = (
+  { bounds, circle }: { bounds: Bounds; circle: Circle },
+  step: number
+): Circle => ({
   ...circle,
-  vel: Vec(
+  vel: createVec(
     updateCirclePos(circle, step).pos.x + circle.radius > bounds.C.x ||
       updateCirclePos(circle, step).pos.x - circle.radius < bounds.A.x
       ? -circle.vel.x
@@ -25,9 +51,9 @@ export const updateCircleVel = ({ bounds, circle }, step) => ({
   ),
 });
 
-export const updateCirclePos = (circle, step) => ({
+export const updateCirclePos = (circle: Circle, step: number): Circle => ({
   ...circle,
-  pos: Vec(
+  pos: createVec(
     circle.pos.x + circle.vel.x * step,
     circle.pos.y + circle.vel.y * step
   ),
