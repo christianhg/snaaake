@@ -23,8 +23,8 @@
     "build": "npm run prettier-production && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "prettier": "prettier --write {*,**/*}.{css,html,js}",
-    "prettier-production": "prettier --list-different {*,**/*}.{css,html,js}"
+    "prettier": "prettier --write {*,**/*}.{css,html,js,ts}",
+    "prettier-production": "prettier --list-different {*,**/*}.{css,html,js,ts}"
   },
   "eslintConfig": {
     "extends": "react-app"
