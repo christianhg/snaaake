@@ -1,10 +1,22 @@
-export const createTimer = ({ step, tick, getState, setState }) => () => {
+type Timer = () => void;
+
+export const createTimer = <State>({
+  step,
+  tick,
+  getState,
+  setState,
+}: {
+  step: number;
+  tick: (state: State, step: number) => State;
+  getState: () => State;
+  setState: (state: State) => void;
+}): Timer => () => {
   let lastTime = 0;
   let accumulatedTime = 0;
-  let frameId;
+  let frameId: number;
   let state = getState();
 
-  const animate = time => {
+  const animate = (time: number) => {
     state = getState();
 
     if (lastTime) {
