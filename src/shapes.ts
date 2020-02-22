@@ -5,7 +5,7 @@ type Pos = {
   y: number;
 };
 
-type Circle = {
+export type Circle = {
   pos: Pos;
   radius: number;
   vel: Vec;
@@ -27,11 +27,9 @@ export const createSquare = (A: Pos, C: Pos): Square => ({
   C,
 });
 
-type Bounds = {
+export type Bounds = {
   A: Pos;
-  B: Pos;
   C: Pos;
-  D: Pos;
 };
 
 export const updateCircleVel = (

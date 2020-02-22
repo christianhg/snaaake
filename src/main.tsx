@@ -1,25 +1,34 @@
 import 'modern-normalize';
 import React, { Component } from 'react';
 import { Canvas } from './canvas';
-import { createEngine } from './engine';
+import { createEngine, Engine } from './engine';
 import { createVec } from './math';
 import {
+  Bounds,
+  Circle,
   createCircle,
   createSquare,
   updateCirclePos,
   updateCircleVel,
 } from './shapes';
+import { identity } from './util';
+import { StateValue } from 'xstate';
 
-const tick = (state, step) => ({
+type State = { bounds: Bounds; circle: Circle };
+
+const tick = (state: State, step: number) => ({
   ...state,
   circle: updateCirclePos(updateCircleVel(state, step), step),
 });
 
-const identity = x => x;
+export class Snaaake extends Component<
+  {},
+  { game: { state: State; status: StateValue } }
+> {
+  private engine: Engine<State>;
 
-export class Snaaake extends Component {
-  constructor() {
-    super();
+  constructor(props: {}) {
+    super(props);
 
     this.engine = createEngine({
       step: 1 / 60,

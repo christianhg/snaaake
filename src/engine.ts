@@ -48,6 +48,15 @@ const engineMachine = Machine<undefined, EngineSchema, EngineEvent>({
   },
 });
 
+export type Engine<State> = {
+  getState: () => State;
+  getStatus: () => StateValue;
+  start: () => void;
+  pause: () => void;
+  resume: () => void;
+  stop: () => void;
+};
+
 export const createEngine = <State>({
   step,
   tick,
@@ -60,7 +69,7 @@ export const createEngine = <State>({
   subscribe: ({ state, status }: { state: State; status: StateValue }) => void;
   initialState: State;
   keyBindings: { element: Window; bindings: Map<Key[], KeyEvents<State>> };
-}) => {
+}): Engine<State> => {
   const getState = () => state;
   const setState = (newState: State) => {
     state = newState;
