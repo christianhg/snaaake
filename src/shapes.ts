@@ -1,6 +1,6 @@
 import { createVec, Vec } from './math';
 
-type Pos = {
+export type Pos = {
   x: number;
   y: number;
 };
