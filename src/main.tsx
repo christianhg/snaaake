@@ -10,6 +10,7 @@ import {
   createSquare,
   updateCirclePos,
   updateCircleVel,
+  drawCircle,
 } from './shapes';
 import { identity } from './util';
 import { StateValue } from 'xstate';
@@ -20,6 +21,21 @@ const tick = (state: State, step: number) => ({
   ...state,
   circle: updateCirclePos(updateCircleVel(state, step), step),
 });
+
+function drawScene(
+  scene: { bounds: Bounds; circle: Circle },
+  context: CanvasRenderingContext2D
+): void {
+  context.clearRect(
+    scene.bounds.A.x,
+    scene.bounds.A.y,
+    scene.bounds.C.x,
+    scene.bounds.C.y
+  );
+  context.fillStyle = '#000000';
+
+  drawCircle({ context, circle: scene.circle, colorCircle: () => '#ffffff' });
+}
 
 export class Snaaake extends Component<
   {},
@@ -126,7 +142,12 @@ export class Snaaake extends Component<
           this.state.game.status === 'paused') && (
           <button onClick={() => this.engine.stop()}>Stop</button>
         )}
-        <Canvas scene={this.state.game.state} />
+        <Canvas
+          width={640}
+          height={640}
+          state={this.state.game.state}
+          draw={drawScene}
+        />
       </div>
     );
   }

@@ -17,6 +17,23 @@ export const createCircle = (radius: number, pos: Pos, vel: Vec): Circle => ({
   vel,
 });
 
+export const drawCircle = ({
+  context,
+  colorCircle,
+  circle,
+}: {
+  context: CanvasRenderingContext2D;
+  colorCircle: (circle: Circle) => string;
+  circle: Circle;
+}) => {
+  context.strokeStyle = colorCircle(circle);
+  context.beginPath();
+  context.lineWidth = 2;
+  context.arc(circle.pos.x, circle.pos.y, circle.radius - 1, 0, Math.PI * 2);
+  context.closePath();
+  context.stroke();
+};
+
 type Square = {
   A: Pos;
   C: Pos;
