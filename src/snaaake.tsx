@@ -1,8 +1,8 @@
 import 'modern-normalize';
 import React, { Component } from 'react';
-import { Canvas } from './canvas';
-import { createEngine, Engine } from './engine';
-import { createVec } from './math';
+import { Canvas } from './engine/canvas';
+import { createEngine, Engine } from './engine/engine';
+import { createVec } from './util/math';
 import {
   Bounds,
   Circle,
@@ -11,8 +11,8 @@ import {
   updateCirclePos,
   updateCircleVel,
   drawCircle,
-} from './shapes';
-import { identity } from './util';
+} from './util/shapes';
+import { identity } from './util/core';
 import { StateValue } from 'xstate';
 
 type State = { bounds: Bounds; circle: Circle };
