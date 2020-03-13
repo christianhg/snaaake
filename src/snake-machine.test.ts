@@ -1,5 +1,12 @@
-import { Bounds, createSnakeMachine, Snake } from './snake-machine';
-import { moveSnake } from './snake';
+import { createSnakeMachine, SnakeMachine } from './snake-machine';
+import {
+  Bounds,
+  Coords,
+  moveSnake,
+  willEatApple,
+  growSnake,
+  Snake,
+} from './snake';
 
 const bounds: Bounds = [
   [0, 0],
@@ -54,29 +61,132 @@ const bounds: Bounds = [
 ];
 
 describe(createSnakeMachine.name, () => {
-  const onUpdate = jest.fn();
-  const onDead = jest.fn();
+  let onUpdate: jest.Mock;
+  let onDead: jest.Mock;
+  let snakeMachine: SnakeMachine<Coords[], Bounds, Snake>;
 
-  const snakeMachine = createSnakeMachine({
-    context: {
-      bounds,
-      snake: [[3, 3]] as Snake,
-    },
-    willExceedBounds: ({ snake }) => snake[0][1] === 0,
-    move: moveSnake,
-    onUpdate,
-    onDead,
+  beforeEach(() => {
+    onUpdate = jest.fn();
+    onDead = jest.fn();
+
+    snakeMachine = createSnakeMachine({
+      context: {
+        apples: [
+          [5, 3],
+          [2, 3],
+          [3, 4],
+        ],
+        bounds,
+        snake: [[3, 3]] as Snake,
+      },
+      willEatApple,
+      willExceedBounds: ({ snake }) => snake[0][1] === 0,
+      move: moveSnake,
+      grow: growSnake,
+      onUpdate,
+      onDead,
+    });
   });
 
-  it('works', () => {
+  it('does not update on ticks when no direction is set', () => {
+    snakeMachine.send('TICK');
+
+    expect(onUpdate).not.toBeCalled();
+  });
+
+  it('can run straight up into a wall', () => {
     snakeMachine.send({ type: 'UP' });
     snakeMachine.send({ type: 'TICK' });
     snakeMachine.send({ type: 'TICK' });
     snakeMachine.send({ type: 'TICK' });
 
-    expect(onUpdate).toHaveBeenNthCalledWith(1, { snake: [[3, 2]] });
-    expect(onUpdate).toHaveBeenNthCalledWith(2, { snake: [[3, 1]] });
-    expect(onUpdate).toHaveBeenNthCalledWith(3, { snake: [[3, 0]] });
+    expect(onUpdate).toHaveBeenNthCalledWith(1, {
+      apples: [
+        [5, 3],
+        [2, 3],
+        [3, 4],
+      ],
+      snake: [[3, 2]],
+    });
+    expect(onUpdate).toHaveBeenNthCalledWith(2, {
+      apples: [
+        [5, 3],
+        [2, 3],
+        [3, 4],
+      ],
+      snake: [[3, 1]],
+    });
+    expect(onUpdate).toHaveBeenNthCalledWith(3, {
+      apples: [
+        [5, 3],
+        [2, 3],
+        [3, 4],
+      ],
+      snake: [[3, 0]],
+    });
     expect(onDead).toHaveBeenCalled();
+  });
+
+  it('can grow', () => {
+    snakeMachine.send('RIGHT');
+    snakeMachine.send('TICK');
+
+    expect(onUpdate).toHaveBeenNthCalledWith(1, {
+      apples: [
+        [5, 3],
+        [2, 3],
+        [3, 4],
+      ],
+      snake: [[4, 3]],
+    });
+    expect(onUpdate).toHaveBeenNthCalledWith(2, {
+      apples: [
+        [2, 3],
+        [3, 4],
+      ],
+      snake: [
+        [5, 3],
+        [4, 3],
+      ],
+    });
+  });
+
+  it('can go in circles', () => {
+    snakeMachine.send('LEFT');
+
+    expect(onUpdate).toHaveBeenNthCalledWith(1, {
+      apples: [
+        [5, 3],
+        [3, 4],
+      ],
+      snake: [
+        [2, 3],
+        [3, 3],
+      ],
+    });
+
+    snakeMachine.send('DOWN');
+
+    expect(onUpdate).toHaveBeenNthCalledWith(2, {
+      apples: [
+        [5, 3],
+        [3, 4],
+      ],
+      snake: [
+        [2, 4],
+        [2, 3],
+      ],
+    });
+
+    snakeMachine.send('RIGHT');
+
+    expect(onUpdate).toHaveBeenNthCalledWith(3, {
+      apples: [[5, 3]],
+      snake: [
+        [3, 4],
+        [2, 4],
+        [2, 3],
+      ],
+    });
   });
 });
