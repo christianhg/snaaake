@@ -88,7 +88,7 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
   }: {
     apples: TApples;
     snake: TSnake;
-    direction: 'up' | 'right' | 'down' | 'left';
+    direction: Direction;
   }) => { apples: TApples; snake: TSnake };
   onUpdate: ({ apples, snake }: { apples: TApples; snake: TSnake }) => void;
   onDead: () => void;
@@ -105,121 +105,57 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
         idle: {
           onEntry: 'resetSnake',
           on: {
-            UP: [
-              { target: 'dead', cond: 'boundUp' },
-              { target: 'dead', cond: 'snakeUp' },
-              { target: 'up', cond: 'appleUp', actions: 'growUp' },
-              { target: 'up', actions: 'moveUp' },
-            ],
-            RIGHT: [
-              { target: 'dead', cond: 'boundRight' },
-              { target: 'dead', cond: 'snakeRight' },
-              { target: 'right', cond: 'appleRight', actions: 'growRight' },
-              { target: 'right', actions: 'moveRight' },
-            ],
-            DOWN: [
-              { target: 'dead', cond: 'boundDown' },
-              { target: 'dead', cond: 'snakeDown' },
-              { target: 'down', cond: 'appleDown', actions: 'growDown' },
-              { target: 'down', actions: 'moveDown' },
-            ],
-            LEFT: [
-              { target: 'dead', cond: 'boundLeft' },
-              { target: 'dead', cond: 'snakeLeft' },
-              { target: 'left', cond: 'appleLeft', actions: 'growLeft' },
-              { target: 'left', actions: 'moveLeft' },
-            ],
+            UP: { target: 'up' },
+            RIGHT: { target: 'right' },
+            DOWN: { target: 'down' },
+            LEFT: { target: 'left' },
           },
         },
         up: {
-          onEntry: 'notifyUpdate',
           on: {
-            RIGHT: [
-              { target: 'dead', cond: 'boundRight' },
-              { target: 'dead', cond: 'snakeRight' },
-              { target: 'right', cond: 'appleRight', actions: 'growRight' },
-              { target: 'right', actions: 'moveRight' },
-            ],
-            LEFT: [
-              { target: 'dead', cond: 'boundLeft' },
-              { target: 'dead', cond: 'snakeLeft' },
-              { target: 'left', cond: 'appleLeft', actions: 'growLeft' },
-              { target: 'left', actions: 'moveLeft' },
-            ],
+            RIGHT: { target: 'right' },
+            LEFT: { target: 'left' },
             TICK: [
               { target: 'dead', cond: 'boundUp' },
               { target: 'dead', cond: 'snakeUp' },
-              { target: 'up', cond: 'appleUp', actions: 'growUp' },
-              { target: 'up', actions: 'moveUp' },
+              { cond: 'appleUp', actions: ['growUp', 'notifyUpdate'] },
+              { actions: ['moveUp', 'notifyUpdate'] },
             ],
           },
         },
         right: {
-          onEntry: 'notifyUpdate',
           on: {
-            UP: [
-              { target: 'dead', cond: 'boundUp' },
-              { target: 'dead', cond: 'snakeUp' },
-              { target: 'up', cond: 'appleUp', actions: 'growUp' },
-              { target: 'up', actions: 'moveUp' },
-            ],
-            DOWN: [
-              { target: 'dead', cond: 'boundDown' },
-              { target: 'dead', cond: 'snakeDown' },
-              { target: 'down', cond: 'appleDown', actions: 'growDown' },
-              { target: 'down', actions: 'moveDown' },
-            ],
+            UP: { target: 'up' },
+            DOWN: { target: 'down' },
             TICK: [
               { target: 'dead', cond: 'boundRight' },
               { target: 'dead', cond: 'snakeRight' },
-              { target: 'right', cond: 'appleRight', actions: 'growRight' },
-              { target: 'right', actions: 'moveRight' },
+              { cond: 'appleRight', actions: ['growRight', 'notifyUpdate'] },
+              { actions: ['moveRight', 'notifyUpdate'] },
             ],
           },
         },
         down: {
-          onEntry: 'notifyUpdate',
           on: {
-            RIGHT: [
-              { target: 'dead', cond: 'boundRight' },
-              { target: 'dead', cond: 'snakeRight' },
-              { target: 'right', cond: 'appleRight', actions: 'growRight' },
-              { target: 'right', actions: 'moveRight' },
-            ],
-            LEFT: [
-              { target: 'dead', cond: 'boundLeft' },
-              { target: 'dead', cond: 'snakeLeft' },
-              { target: 'left', cond: 'appleLeft', actions: 'growLeft' },
-              { target: 'left', actions: 'moveLeft' },
-            ],
+            RIGHT: { target: 'right' },
+            LEFT: { target: 'left' },
             TICK: [
               { target: 'dead', cond: 'boundDown' },
               { target: 'dead', cond: 'snakeDown' },
-              { target: 'down', cond: 'appleDown', actions: 'growDown' },
-              { target: 'down', actions: 'moveDown' },
+              { cond: 'appleDown', actions: ['growDown', 'notifyUpdate'] },
+              { actions: ['moveDown', 'notifyUpdate'] },
             ],
           },
         },
         left: {
-          onEntry: 'notifyUpdate',
           on: {
-            UP: [
-              { target: 'dead', cond: 'boundUp' },
-              { target: 'dead', cond: 'snakeUp' },
-              { target: 'up', cond: 'appleUp', actions: 'growUp' },
-              { target: 'up', actions: 'moveUp' },
-            ],
-            DOWN: [
-              { target: 'dead', cond: 'boundDown' },
-              { target: 'dead', cond: 'snakeDown' },
-              { target: 'down', cond: 'appleDown', actions: 'growDown' },
-              { target: 'down', actions: 'moveDown' },
-            ],
+            UP: { target: 'up' },
+            DOWN: { target: 'down' },
             TICK: [
               { target: 'dead', cond: 'boundLeft' },
               { target: 'dead', cond: 'snakeLeft' },
-              { target: 'left', cond: 'appleLeft', actions: 'growLeft' },
-              { target: 'left', actions: 'moveLeft' },
+              { cond: 'appleLeft', actions: ['growLeft', 'notifyUpdate'] },
+              { actions: ['moveLeft', 'notifyUpdate'] },
             ],
           },
         },

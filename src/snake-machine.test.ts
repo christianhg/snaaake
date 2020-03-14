@@ -102,6 +102,7 @@ describe(createSnakeMachine.name, () => {
     snakeMachine.send('TICK');
     snakeMachine.send('TICK');
     snakeMachine.send('TICK');
+    snakeMachine.send('TICK');
 
     expect(onUpdate).toHaveBeenNthCalledWith(1, {
       apples: [
@@ -133,6 +134,7 @@ describe(createSnakeMachine.name, () => {
   it('can grow', () => {
     snakeMachine.send('RIGHT');
     snakeMachine.send('TICK');
+    snakeMachine.send('TICK');
 
     expect(onUpdate).toHaveBeenNthCalledWith(1, {
       apples: [
@@ -156,6 +158,7 @@ describe(createSnakeMachine.name, () => {
 
   it('can go in circles', () => {
     snakeMachine.send('LEFT');
+    snakeMachine.send('TICK');
 
     expect(onUpdate).toHaveBeenNthCalledWith(1, {
       apples: [
@@ -169,6 +172,7 @@ describe(createSnakeMachine.name, () => {
     });
 
     snakeMachine.send('DOWN');
+    snakeMachine.send('TICK');
 
     expect(onUpdate).toHaveBeenNthCalledWith(2, {
       apples: [
@@ -182,6 +186,7 @@ describe(createSnakeMachine.name, () => {
     });
 
     snakeMachine.send('RIGHT');
+    snakeMachine.send('TICK');
 
     expect(onUpdate).toHaveBeenNthCalledWith(3, {
       apples: [[5, 3]],
