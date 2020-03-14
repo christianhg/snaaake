@@ -10,17 +10,14 @@ function createCoords(a: number, b: number): Coords {
   return [a, b];
 }
 
-export function moveSnake(
-  snake: Snake,
-  direction: 'up' | 'right' | 'down' | 'left'
-): Snake {
+export function moveSnake(snake: Snake, direction: Direction): Snake {
   const head = snake[0];
   const newHead =
-    direction === 'up'
+    direction === Direction.up
       ? createCoords(head[0], head[1] - 1)
-      : direction === 'right'
+      : direction === Direction.right
       ? createCoords(head[0] + 1, head[1])
-      : direction === 'down'
+      : direction === Direction.down
       ? createCoords(head[0], head[1] + 1)
       : createCoords(head[0] - 1, head[1]);
 
@@ -42,11 +39,11 @@ export function willEatApple({
 }): boolean {
   const head = snake[0];
 
-  return direction === 'up'
+  return direction === Direction.up
     ? apples.some(apple => apple[0] === head[0] && apple[1] === head[1] - 1)
-    : direction === 'right'
+    : direction === Direction.right
     ? apples.some(apple => apple[0] === head[0] + 1 && apple[1] === head[1])
-    : direction === 'down'
+    : direction === Direction.down
     ? apples.some(apple => apple[0] === head[0] && apple[1] === head[1] + 1)
     : apples.some(apple => apple[0] === head[0] - 1 && apple[1] === head[1]);
 }
@@ -97,15 +94,15 @@ export function growSnake({
 }: {
   apples: Apples;
   snake: Snake;
-  direction: 'up' | 'right' | 'down' | 'left';
+  direction: Direction;
 }): { apples: Coords[]; snake: Snake } {
   const head = snake[0];
   const newHead: Coords =
-    direction === 'up'
+    direction === Direction.up
       ? [head[0], head[1] - 1]
-      : direction === 'right'
+      : direction === Direction.right
       ? [head[0] + 1, head[1]]
-      : direction === 'down'
+      : direction === Direction.down
       ? [head[0], head[1] + 1]
       : [head[0] - 1, head[1]];
 

@@ -98,10 +98,10 @@ describe(createSnakeMachine.name, () => {
   });
 
   it('can run straight up into a wall', () => {
-    snakeMachine.send({ type: 'UP' });
-    snakeMachine.send({ type: 'TICK' });
-    snakeMachine.send({ type: 'TICK' });
-    snakeMachine.send({ type: 'TICK' });
+    snakeMachine.send('UP');
+    snakeMachine.send('TICK');
+    snakeMachine.send('TICK');
+    snakeMachine.send('TICK');
 
     expect(onUpdate).toHaveBeenNthCalledWith(1, {
       apples: [
