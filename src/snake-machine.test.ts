@@ -1,11 +1,13 @@
 import { createSnakeMachine, SnakeMachine } from './snake-machine';
 import {
+  Apples,
   Bounds,
-  Coords,
   moveSnake,
   willEatApple,
   growSnake,
   Snake,
+  willExceedBounds,
+  willHitItself,
 } from './snake';
 
 const bounds: Bounds = [
@@ -63,13 +65,13 @@ const bounds: Bounds = [
 describe(createSnakeMachine.name, () => {
   let onUpdate: jest.Mock;
   let onDead: jest.Mock;
-  let snakeMachine: SnakeMachine<Coords[], Bounds, Snake>;
+  let snakeMachine: SnakeMachine<Apples, Bounds, Snake>;
 
   beforeEach(() => {
     onUpdate = jest.fn();
     onDead = jest.fn();
 
-    snakeMachine = createSnakeMachine({
+    snakeMachine = createSnakeMachine<Apples, Bounds, Snake>({
       context: {
         apples: [
           [5, 3],
@@ -77,10 +79,11 @@ describe(createSnakeMachine.name, () => {
           [3, 4],
         ],
         bounds,
-        snake: [[3, 3]] as Snake,
+        snake: [[3, 3]],
       },
       willEatApple,
-      willExceedBounds: ({ snake }) => snake[0][1] === 0,
+      willExceedBounds,
+      willHitItself,
       move: moveSnake,
       grow: growSnake,
       onUpdate,

@@ -31,30 +31,56 @@ export type SnakeMachine<TApples, TBounds, TSnake> = Interpreter<
   SnakeEvent
 >;
 
+export enum Direction {
+  up = 'up',
+  right = 'right',
+  down = 'down',
+  left = 'left',
+}
+
+export type WillExceedBounds<TBounds, TSnake> = ({
+  bounds,
+  snake,
+  direction,
+}: {
+  bounds: TBounds;
+  snake: TSnake;
+  direction: Direction;
+}) => boolean;
+
+export type WillHitItself<TSnake> = ({
+  snake,
+  direction,
+}: {
+  snake: TSnake;
+  direction: Direction;
+}) => boolean;
+
+export type WillEatApple<TApples, TSnake> = ({
+  apples,
+  snake,
+  direction,
+}: {
+  apples: TApples;
+  snake: TSnake;
+  direction: Direction;
+}) => boolean;
+
 export function createSnakeMachine<TApples, TBounds, TSnake>({
   context,
   willExceedBounds,
   willEatApple,
+  willHitItself,
   move,
   grow,
   onUpdate,
   onDead,
 }: {
   context: SnakeContext<TApples, TBounds, TSnake>;
-  willExceedBounds: (
-    context: SnakeContext<TApples, TBounds, TSnake>,
-    event: SnakeEvent
-  ) => boolean;
-  willEatApple: ({
-    apples,
-    snake,
-    direction,
-  }: {
-    apples: TApples;
-    snake: TSnake;
-    direction: 'up' | 'right' | 'down' | 'left';
-  }) => boolean;
-  move: (snake: TSnake, direction: 'up' | 'right' | 'down' | 'left') => TSnake;
+  willExceedBounds: WillExceedBounds<TBounds, TSnake>;
+  willEatApple: WillEatApple<TApples, TSnake>;
+  willHitItself: WillHitItself<TSnake>;
+  move: (snake: TSnake, direction: Direction) => TSnake;
   grow: ({
     apples,
     snake,
@@ -80,20 +106,27 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
           onEntry: 'resetSnake',
           on: {
             UP: [
-              { target: 'dead', cond: 'willExceedBounds' },
+              { target: 'dead', cond: 'boundUp' },
+              { target: 'dead', cond: 'snakeUp' },
+              { target: 'up', cond: 'appleUp', actions: 'growUp' },
               { target: 'up', actions: 'moveUp' },
             ],
             RIGHT: [
-              { target: 'dead', cond: 'willExceedBounds' },
+              { target: 'dead', cond: 'boundRight' },
+              { target: 'dead', cond: 'snakeRight' },
+              { target: 'right', cond: 'appleRight', actions: 'growRight' },
               { target: 'right', actions: 'moveRight' },
             ],
             DOWN: [
-              { target: 'dead', cond: 'willExceedBounds' },
-              { target: 'down' },
+              { target: 'dead', cond: 'boundDown' },
+              { target: 'dead', cond: 'snakeDown' },
+              { target: 'down', cond: 'appleDown', actions: 'growDown' },
+              { target: 'down', actions: 'moveDown' },
             ],
             LEFT: [
-              { target: 'dead', cond: 'willExceedBounds' },
-              { target: 'left', cond: 'willEatApple', actions: 'growLeft' },
+              { target: 'dead', cond: 'boundLeft' },
+              { target: 'dead', cond: 'snakeLeft' },
+              { target: 'left', cond: 'appleLeft', actions: 'growLeft' },
               { target: 'left', actions: 'moveLeft' },
             ],
           },
@@ -102,15 +135,21 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
           onEntry: 'notifyUpdate',
           on: {
             RIGHT: [
-              { target: 'dead', cond: 'willExceedBounds' },
-              { target: 'right' },
+              { target: 'dead', cond: 'boundRight' },
+              { target: 'dead', cond: 'snakeRight' },
+              { target: 'right', cond: 'appleRight', actions: 'growRight' },
+              { target: 'right', actions: 'moveRight' },
             ],
             LEFT: [
-              { target: 'dead', cond: 'willExceedBounds' },
-              { target: 'left' },
+              { target: 'dead', cond: 'boundLeft' },
+              { target: 'dead', cond: 'snakeLeft' },
+              { target: 'left', cond: 'appleLeft', actions: 'growLeft' },
+              { target: 'left', actions: 'moveLeft' },
             ],
             TICK: [
-              { target: 'dead', cond: 'willExceedBounds' },
+              { target: 'dead', cond: 'boundUp' },
+              { target: 'dead', cond: 'snakeUp' },
+              { target: 'up', cond: 'appleUp', actions: 'growUp' },
               { target: 'up', actions: 'moveUp' },
             ],
           },
@@ -119,16 +158,21 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
           onEntry: 'notifyUpdate',
           on: {
             UP: [
-              { target: 'up', cond: 'willExceedBounds' },
-              { target: 'dead' },
+              { target: 'dead', cond: 'boundUp' },
+              { target: 'dead', cond: 'snakeUp' },
+              { target: 'up', cond: 'appleUp', actions: 'growUp' },
+              { target: 'up', actions: 'moveUp' },
             ],
             DOWN: [
-              { target: 'down', cond: 'willExceedBounds' },
-              { target: 'dead' },
+              { target: 'dead', cond: 'boundDown' },
+              { target: 'dead', cond: 'snakeDown' },
+              { target: 'down', cond: 'appleDown', actions: 'growDown' },
+              { target: 'down', actions: 'moveDown' },
             ],
             TICK: [
-              { target: 'dead', cond: 'willExceedBounds' },
-              { target: 'right', cond: 'willEatApple', actions: 'growRight' },
+              { target: 'dead', cond: 'boundRight' },
+              { target: 'dead', cond: 'snakeRight' },
+              { target: 'right', cond: 'appleRight', actions: 'growRight' },
               { target: 'right', actions: 'moveRight' },
             ],
           },
@@ -137,13 +181,22 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
           onEntry: 'notifyUpdate',
           on: {
             RIGHT: [
-              { target: 'dead', cond: 'willExceedBounds' },
-              { target: 'right', cond: 'willEatApple', actions: 'growRight' },
+              { target: 'dead', cond: 'boundRight' },
+              { target: 'dead', cond: 'snakeRight' },
+              { target: 'right', cond: 'appleRight', actions: 'growRight' },
               { target: 'right', actions: 'moveRight' },
             ],
             LEFT: [
-              { target: 'dead', cond: 'willExceedBounds' },
+              { target: 'dead', cond: 'boundLeft' },
+              { target: 'dead', cond: 'snakeLeft' },
+              { target: 'left', cond: 'appleLeft', actions: 'growLeft' },
               { target: 'left', actions: 'moveLeft' },
+            ],
+            TICK: [
+              { target: 'dead', cond: 'boundDown' },
+              { target: 'dead', cond: 'snakeDown' },
+              { target: 'down', cond: 'appleDown', actions: 'growDown' },
+              { target: 'down', actions: 'moveDown' },
             ],
           },
         },
@@ -151,12 +204,22 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
           onEntry: 'notifyUpdate',
           on: {
             UP: [
-              { target: 'dead', cond: 'willExceedBounds' },
-              { target: 'up' },
+              { target: 'dead', cond: 'boundUp' },
+              { target: 'dead', cond: 'snakeUp' },
+              { target: 'up', cond: 'appleUp', actions: 'growUp' },
+              { target: 'up', actions: 'moveUp' },
             ],
             DOWN: [
-              { target: 'dead', cond: 'willExceedBounds' },
+              { target: 'dead', cond: 'boundDown' },
+              { target: 'dead', cond: 'snakeDown' },
+              { target: 'down', cond: 'appleDown', actions: 'growDown' },
               { target: 'down', actions: 'moveDown' },
+            ],
+            TICK: [
+              { target: 'dead', cond: 'boundLeft' },
+              { target: 'dead', cond: 'snakeLeft' },
+              { target: 'left', cond: 'appleLeft', actions: 'growLeft' },
+              { target: 'left', actions: 'moveLeft' },
             ],
           },
         },
@@ -173,29 +236,43 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
     {
       actions: {
         moveUp: assign({
-          snake: ({ snake }) => move(snake, 'up'),
+          snake: ({ snake }) => move(snake, Direction.up),
         }),
         moveRight: assign({
-          snake: ({ snake }) => move(snake, 'right'),
+          snake: ({ snake }) => move(snake, Direction.right),
         }),
         moveDown: assign({
-          snake: ({ snake }) => move(snake, 'down'),
+          snake: ({ snake }) => move(snake, Direction.down),
         }),
         moveLeft: assign({
-          snake: ({ snake }) => move(snake, 'left'),
+          snake: ({ snake }) => move(snake, Direction.left),
+        }),
+
+        growUp: assign({
+          apples: ({ apples, snake }) =>
+            grow({ apples, snake, direction: Direction.up }).apples,
+          snake: ({ apples, snake }) =>
+            grow({ apples, snake, direction: Direction.up }).snake,
         }),
         growRight: assign({
           apples: ({ apples, snake }) =>
-            grow({ apples, snake, direction: 'right' }).apples,
+            grow({ apples, snake, direction: Direction.right }).apples,
           snake: ({ apples, snake }) =>
-            grow({ apples, snake, direction: 'right' }).snake,
+            grow({ apples, snake, direction: Direction.right }).snake,
+        }),
+        growDown: assign({
+          apples: ({ apples, snake }) =>
+            grow({ apples, snake, direction: Direction.down }).apples,
+          snake: ({ apples, snake }) =>
+            grow({ apples, snake, direction: Direction.down }).snake,
         }),
         growLeft: assign({
           apples: ({ apples, snake }) =>
-            grow({ apples, snake, direction: 'left' }).apples,
+            grow({ apples, snake, direction: Direction.left }).apples,
           snake: ({ apples, snake }) =>
-            grow({ apples, snake, direction: 'left' }).snake,
+            grow({ apples, snake, direction: Direction.left }).snake,
         }),
+
         notifyUpdate: ({ apples, snake }) => onUpdate({ apples, snake }),
         notifyDead: onDead,
         resetSnake: assign({
@@ -203,44 +280,37 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
         }),
       },
       guards: {
-        willExceedBounds,
-        willEatApple: ({ apples, snake }, event, meta) => {
-          if (meta.state.value !== 'dead') {
-            if (event.type === 'UP') {
-              return willEatApple({ apples, snake, direction: 'up' });
-            }
-            if (event.type === 'RIGHT') {
-              return willEatApple({ apples, snake, direction: 'right' });
-            }
-            if (event.type === 'DOWN') {
-              return willEatApple({ apples, snake, direction: 'down' });
-            }
-            if (event.type === 'LEFT') {
-              return willEatApple({ apples, snake, direction: 'left' });
-            }
-          }
+        appleUp: ({ apples, snake }) =>
+          willEatApple({ apples, snake, direction: Direction.up }),
+        appleRight: ({ apples, snake }) =>
+          willEatApple({ apples, snake, direction: Direction.right }),
+        appleDown: ({ apples, snake }) =>
+          willEatApple({ apples, snake, direction: Direction.down }),
+        appleLeft: ({ apples, snake }) =>
+          willEatApple({ apples, snake, direction: Direction.left }),
 
-          if (
-            event.type === 'TICK' &&
-            (meta.state.value === 'up' ||
-              meta.state.value === 'right' ||
-              meta.state.value === 'down' ||
-              meta.state.value === 'left')
-          ) {
-            return willEatApple({ apples, snake, direction: meta.state.value });
-          }
+        boundUp: ({ bounds, snake }) =>
+          willExceedBounds({ bounds, snake, direction: Direction.up }),
+        boundRight: ({ bounds, snake }) =>
+          willExceedBounds({ bounds, snake, direction: Direction.right }),
+        boundDown: ({ bounds, snake }) =>
+          willExceedBounds({ bounds, snake, direction: Direction.down }),
+        boundLeft: ({ bounds, snake }) =>
+          willExceedBounds({ bounds, snake, direction: Direction.left }),
 
-          return false;
-        },
+        snakeUp: ({ snake }) =>
+          willHitItself({ snake, direction: Direction.up }),
+        snakeRight: ({ snake }) =>
+          willHitItself({ snake, direction: Direction.right }),
+        snakeDown: ({ snake }) =>
+          willHitItself({ snake, direction: Direction.down }),
+        snakeLeft: ({ snake }) =>
+          willHitItself({ snake, direction: Direction.left }),
       },
     }
   );
 
-  const interpreter = interpret(machine)
-    .start()
-    .onTransition((x, y) => {
-      console.log(`${y.type} => ${x.value}`);
-    });
+  const interpreter = interpret(machine).start();
 
   return interpreter;
 }
