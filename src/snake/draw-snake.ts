@@ -1,4 +1,4 @@
-import { Snake, Apples, Bounds } from "./snake";
+import { Snake, Apples, Bounds } from './snake';
 
 function drawSnake(snake: Snake, context: CanvasRenderingContext2D): void {
   snake.forEach(part => {
@@ -29,8 +29,10 @@ function drawApples(apples: Apples, context: CanvasRenderingContext2D): void {
   }
 }
 
-export function drawScene({ bounds, apples , snake}: {bounds: Bounds, apples: Apples
- snake: Snake}, context: CanvasRenderingContext2D): void {
+export function drawScene(
+  { bounds, apples, snake }: { bounds: Bounds; apples: Apples; snake: Snake },
+  context: CanvasRenderingContext2D
+): void {
   context.clearRect(
     bounds[0][0],
     bounds[0][1],
