@@ -125,11 +125,11 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
       on: {
         RESTART: {
           target: 'idle',
+          actions: ['resetSnake', 'notifyUpdate'],
         },
       },
       states: {
         idle: {
-          onEntry: ['resetSnake', 'notifyUpdate'],
           on: {
             UP: { target: 'up' },
             RIGHT: { target: 'right' },
