@@ -162,12 +162,16 @@ export class Snaaake extends Component<
           width={
             this.state.game.state.bounds[
               this.state.game.state.bounds.length - 1
-            ][0] * 10
+            ][0] *
+              10 +
+            10
           }
           height={
             this.state.game.state.bounds[
               this.state.game.state.bounds.length - 1
-            ][1] * 10
+            ][1] *
+              10 +
+            10
           }
           state={this.state.game.state}
           draw={drawScene}

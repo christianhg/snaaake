@@ -36,8 +36,8 @@ export function drawScene(
   context.clearRect(
     bounds[0][0],
     bounds[0][1],
-    bounds[bounds.length - 1][0] * 10,
-    bounds[bounds.length - 1][1] * 10
+    bounds[bounds.length - 1][0] * 10 + 10,
+    bounds[bounds.length - 1][1] * 10 + 10
   );
   context.fillStyle = '#000000';
 
