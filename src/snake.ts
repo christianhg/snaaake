@@ -10,6 +10,24 @@ function createCoords(a: number, b: number): Coords {
   return [a, b];
 }
 
+export function createBounds({
+  width,
+  height,
+}: {
+  width: number;
+  height: number;
+}): Bounds {
+  let bounds: Coords[] = [];
+
+  for (let x = 0; x <= width; x++) {
+    for (let y = 0; y <= height; y++) {
+      bounds.push([x, y]);
+    }
+  }
+
+  return bounds as Bounds;
+}
+
 export function moveSnake(snake: Snake, direction: Direction): Snake {
   const head = snake[0];
   const newHead =

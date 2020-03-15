@@ -2,58 +2,131 @@ import 'modern-normalize';
 import React, { Component } from 'react';
 import { Canvas } from './engine/canvas';
 import { createEngine, Engine } from './engine/engine';
-import { createVec } from './util/math';
-import {
-  Bounds,
-  Circle,
-  createCircle,
-  createSquare,
-  updateCirclePos,
-  updateCircleVel,
-  drawCircle,
-} from './util/shapes';
-import { identity } from './util/core';
 import { StateValue } from 'xstate';
+import { SnakeMachine, createSnakeMachine } from './snake-machine';
+import {
+  Apples,
+  Bounds,
+  Snake,
+  createBounds,
+  willExceedBounds,
+  willEatApple,
+  willHitItself,
+  moveSnake,
+  growSnake,
+} from './snake';
 
-type State = { bounds: Bounds; circle: Circle };
+type State = { apples: Apples; bounds: Bounds; snake: Snake };
 
-const tick = (state: State, step: number) => ({
-  ...state,
-  circle: updateCirclePos(updateCircleVel(state, step), step),
-});
+function drawSnake(snake: Snake, context: CanvasRenderingContext2D): void {
+  snake.forEach(part => {
+    context.strokeStyle = '#ffffff';
+    context.beginPath();
+    context.lineWidth = 2;
+    context.rect(part[0] * 10, part[1] * 10, 10, 10);
+    context.stroke();
+  });
+}
 
-function drawScene(
-  scene: { bounds: Bounds; circle: Circle },
-  context: CanvasRenderingContext2D
-): void {
+function drawApples(apples: Apples, context: CanvasRenderingContext2D): void {
+  const firstApple = apples[0];
+
+  if (firstApple) {
+    context.strokeStyle = '#ffffff';
+    context.beginPath();
+    context.lineWidth = 2;
+    context.arc(
+      firstApple[0] * 10 + 5,
+      firstApple[1] * 10 + 5,
+      5,
+      0,
+      Math.PI * 2
+    );
+    context.closePath();
+    context.stroke();
+  }
+}
+
+function drawScene(scene: State, context: CanvasRenderingContext2D): void {
   context.clearRect(
-    scene.bounds.A.x,
-    scene.bounds.A.y,
-    scene.bounds.C.x,
-    scene.bounds.C.y
+    scene.bounds[0][0],
+    scene.bounds[0][1],
+    scene.bounds[scene.bounds.length - 1][0] * 10,
+    scene.bounds[scene.bounds.length - 1][1] * 10
   );
   context.fillStyle = '#000000';
 
-  drawCircle({ context, circle: scene.circle, colorCircle: () => '#ffffff' });
+  drawSnake(scene.snake, context);
+  drawApples(scene.apples, context);
 }
 
 export class Snaaake extends Component<
   {},
   { game: { state: State; status: StateValue } }
 > {
-  private engine: Engine<State>;
+  private engine: Engine;
+  private snakeMachine: SnakeMachine<Apples, Bounds, Snake>;
 
   constructor(props: {}) {
     super(props);
 
+    const initialState: State = {
+      apples: [[10, 10]],
+      bounds: createBounds({ width: 48, height: 48 }),
+      snake: [
+        [0, 0],
+        [0, 1],
+        [1, 1],
+      ],
+    };
+
+    let nextState: { apples: Apples; snake: Snake } = {
+      apples: [[10, 10]],
+      snake: [
+        [0, 0],
+        [0, 1],
+        [1, 1],
+      ],
+    };
+
+    this.snakeMachine = createSnakeMachine<Apples, Bounds, Snake>({
+      context: initialState,
+      willExceedBounds,
+      willEatApple,
+      willHitItself,
+      move: moveSnake,
+      grow: growSnake,
+      onDead: () => {},
+      onUpdate: ({ apples, snake }) => {
+        nextState = { apples, snake };
+        // this.setState({ game: {
+        //   ...this.state.game,
+        //   state: {
+        //     ...this.state.game.state,
+        //     apples,
+        //     snake
+        //   }
+        // }})
+      },
+    });
+
     this.engine = createEngine({
-      step: 1 / 60,
-      tick,
-      subscribe: ({ state, status }) =>
-        this.setState({ game: { state, status } }),
-      initialState: {
-        circle: createCircle(20, createVec(320, 320), createVec(0, 0)),
-        bounds: createSquare(createVec(0, 0), createVec(640, 640)),
+      step: 1 / 4,
+      onTick: () => {
+        this.snakeMachine.send('TICK');
+      },
+      onUpdate: status => {
+        this.setState({
+          game: {
+            ...this.state.game,
+            status,
+            state: {
+              ...this.state.game.state,
+              apples: nextState.apples,
+              snake: nextState.snake,
+            },
+          },
+        });
       },
       keyBindings: {
         element: window,
@@ -61,53 +134,37 @@ export class Snaaake extends Component<
           [
             ['w', 'ArrowUp'],
             {
-              down: state => ({
-                ...state,
-                circle: {
-                  ...state.circle,
-                  vel: createVec(state.circle.vel.x, state.circle.vel.y - 1),
-                },
-              }),
-              up: identity,
+              down: () => {
+                this.snakeMachine.send('UP');
+              },
+              up: () => {},
             },
           ],
           [
             ['d', 'ArrowRight'],
             {
-              down: state => ({
-                ...state,
-                circle: {
-                  ...state.circle,
-                  vel: createVec(state.circle.vel.x + 1, state.circle.vel.y),
-                },
-              }),
-              up: identity,
+              down: () => {
+                this.snakeMachine.send('RIGHT');
+              },
+              up: () => {},
             },
           ],
           [
             ['s', 'ArrowDown'],
             {
-              down: state => ({
-                ...state,
-                circle: {
-                  ...state.circle,
-                  vel: createVec(state.circle.vel.x, state.circle.vel.y + 1),
-                },
-              }),
-              up: identity,
+              down: () => {
+                this.snakeMachine.send('DOWN');
+              },
+              up: () => {},
             },
           ],
           [
             ['a', 'ArrowLeft'],
             {
-              down: state => ({
-                ...state,
-                circle: {
-                  ...state.circle,
-                  vel: createVec(state.circle.vel.x - 1, state.circle.vel.y),
-                },
-              }),
-              up: identity,
+              down: () => {
+                this.snakeMachine.send('LEFT');
+              },
+              up: () => {},
             },
           ],
         ]),
@@ -116,7 +173,7 @@ export class Snaaake extends Component<
 
     this.state = {
       game: {
-        state: this.engine.getState(),
+        state: initialState,
         status: this.engine.getStatus(),
       },
     };
@@ -143,8 +200,16 @@ export class Snaaake extends Component<
           <button onClick={() => this.engine.stop()}>Stop</button>
         )}
         <Canvas
-          width={640}
-          height={640}
+          width={
+            this.state.game.state.bounds[
+              this.state.game.state.bounds.length - 1
+            ][0] * 10
+          }
+          height={
+            this.state.game.state.bounds[
+              this.state.game.state.bounds.length - 1
+            ][1] * 10
+          }
           state={this.state.game.state}
           draw={drawScene}
         />

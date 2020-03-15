@@ -1,20 +1,16 @@
 export type Key = string;
 
-export type KeyEvents<State> = {
-  down: (state: State) => State;
-  up: (state: State) => State;
+export type KeyEvents = {
+  down: () => void;
+  up: () => void;
 };
 
-export const bindKeys = <State>({
+export const bindKeys = ({
   element,
   bindings,
-  getState,
-  setState,
 }: {
   element: Window;
-  bindings: Map<Key[], KeyEvents<State>>;
-  getState: () => State;
-  setState: (state: State) => void;
+  bindings: Map<Key[], KeyEvents>;
 }) => {
   const keyStates = new Map<Key, 'keyup' | 'keydown'>();
   const isDown = (key: Key) => keyStates.get(key) === 'keydown';
@@ -32,7 +28,7 @@ export const bindKeys = <State>({
         !siblingsPressed(keys, keyPressed) &&
         !isDown(keyPressed)
       ) {
-        setState(down(getState()));
+        down();
         keyStates.set(keyPressed, 'keydown');
       }
     });
@@ -47,7 +43,7 @@ export const bindKeys = <State>({
         !siblingsPressed(keys, keyPressed) &&
         isDown(keyPressed)
       ) {
-        setState(up(getState()));
+        up();
         keyStates.set(keyPressed, 'keyup');
       }
     });
