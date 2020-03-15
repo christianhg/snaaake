@@ -21,7 +21,6 @@ export const createTimer = <State>({
         accumulatedTime = accumulatedTime - step;
 
         onTick();
-        console.log('tick')
       }
     }
 

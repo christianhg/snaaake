@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Canvas } from './engine/canvas';
 import { createEngine, Engine } from './engine/engine';
 import { StateValue } from 'xstate';
-import { SnakeMachine, createSnakeMachine } from './snake-machine';
+import { SnakeMachine, createSnakeMachine } from './snake/snake-machine';
 import {
   Apples,
   Bounds,
@@ -14,51 +14,10 @@ import {
   willHitItself,
   moveSnake,
   growSnake,
-} from './snake';
+} from './snake/snake';
+import { drawScene } from './snake/draw-snake';
 
 type State = { apples: Apples; bounds: Bounds; snake: Snake };
-
-function drawSnake(snake: Snake, context: CanvasRenderingContext2D): void {
-  snake.forEach(part => {
-    context.strokeStyle = '#ffffff';
-    context.beginPath();
-    context.lineWidth = 2;
-    context.rect(part[0] * 10, part[1] * 10, 10, 10);
-    context.stroke();
-  });
-}
-
-function drawApples(apples: Apples, context: CanvasRenderingContext2D): void {
-  const firstApple = apples[0];
-
-  if (firstApple) {
-    context.strokeStyle = '#ffffff';
-    context.beginPath();
-    context.lineWidth = 2;
-    context.arc(
-      firstApple[0] * 10 + 5,
-      firstApple[1] * 10 + 5,
-      5,
-      0,
-      Math.PI * 2
-    );
-    context.closePath();
-    context.stroke();
-  }
-}
-
-function drawScene(scene: State, context: CanvasRenderingContext2D): void {
-  context.clearRect(
-    scene.bounds[0][0],
-    scene.bounds[0][1],
-    scene.bounds[scene.bounds.length - 1][0] * 10,
-    scene.bounds[scene.bounds.length - 1][1] * 10
-  );
-  context.fillStyle = '#000000';
-
-  drawSnake(scene.snake, context);
-  drawApples(scene.apples, context);
-}
 
 export class Snaaake extends Component<
   {},
@@ -70,14 +29,19 @@ export class Snaaake extends Component<
   constructor(props: {}) {
     super(props);
 
-    const initialState: State = {
-      apples: [[10, 10]],
-      bounds: createBounds({ width: 48, height: 48 }),
-      snake: [
-        [0, 0],
-        [0, 1],
-        [1, 1],
-      ],
+    this.state = {
+      game: {
+        state: {
+          apples: [[10, 10]],
+          bounds: createBounds({ width: 48, height: 48 }),
+          snake: [
+            [0, 0],
+            [0, 1],
+            [1, 1],
+          ],
+        },
+        status: 'idle',
+      },
     };
 
     let nextState: { apples: Apples; snake: Snake } = {
@@ -90,7 +54,7 @@ export class Snaaake extends Component<
     };
 
     this.snakeMachine = createSnakeMachine<Apples, Bounds, Snake>({
-      context: initialState,
+      context: this.state.game.state,
       willExceedBounds,
       willEatApple,
       willHitItself,
@@ -99,27 +63,18 @@ export class Snaaake extends Component<
       onDead: () => {},
       onUpdate: ({ apples, snake }) => {
         nextState = { apples, snake };
-        // this.setState({ game: {
-        //   ...this.state.game,
-        //   state: {
-        //     ...this.state.game.state,
-        //     apples,
-        //     snake
-        //   }
-        // }})
       },
     });
 
     this.engine = createEngine({
-      step: 1 / 4,
+      step: 1 / 8,
       onTick: () => {
         this.snakeMachine.send('TICK');
       },
-      onUpdate: status => {
+      onUpdate: () => {
         this.setState({
           game: {
             ...this.state.game,
-            status,
             state: {
               ...this.state.game.state,
               apples: nextState.apples,
@@ -127,6 +82,17 @@ export class Snaaake extends Component<
             },
           },
         });
+      },
+      onStatusChanged: status => {
+        this.setState({
+          game: {
+            ...this.state.game,
+            status,
+          },
+        });
+      },
+      onStop: () => {
+        this.snakeMachine.send('RESTART');
       },
       keyBindings: {
         element: window,
@@ -170,13 +136,6 @@ export class Snaaake extends Component<
         ]),
       },
     });
-
-    this.state = {
-      game: {
-        state: initialState,
-        status: this.engine.getStatus(),
-      },
-    };
   }
 
   render() {

@@ -1,4 +1,4 @@
-import { Machine, StateSchema, StateValue } from 'xstate';
+import { Machine, StateSchema, StateValue, interpret } from 'xstate';
 import { bindKeys, Key, KeyEvents } from './keyboard';
 import { createTimer } from './timer';
 
@@ -17,39 +17,7 @@ type EngineEvent =
   | { type: 'STOP' }
   | { type: 'RESUME' };
 
-const engineMachine = Machine<undefined, EngineSchema, EngineEvent>({
-  initial: 'idle',
-  states: {
-    idle: {
-      on: {
-        START: 'running',
-      },
-    },
-    running: {
-      on: {
-        PAUSE: 'paused',
-        STOP: 'stopped',
-      },
-      onEntry: 'startEngine',
-    },
-    paused: {
-      on: {
-        RESUME: 'running',
-        STOP: 'stopped',
-      },
-      onEntry: 'pauseEngine',
-    },
-    stopped: {
-      on: {
-        START: 'running',
-      },
-      onEntry: 'stopEngine',
-    },
-  },
-});
-
 export type Engine = {
-  getStatus: () => StateValue;
   start: () => void;
   pause: () => void;
   resume: () => void;
@@ -60,76 +28,97 @@ export const createEngine = ({
   step,
   onTick,
   onUpdate,
+  onStatusChanged,
+  onStop,
   keyBindings: { element, bindings },
 }: {
   step: number;
   onTick: () => void;
-  onUpdate: (status: StateValue) => void;
+  onUpdate: () => void;
+  onStatusChanged: (status: StateValue) => void;
+  onStop: () => void;
   keyBindings: { element: Window; bindings: Map<Key[], KeyEvents> };
 }): Engine => {
-  let status = engineMachine.initialState.value;
+  const engineMachine = Machine<undefined, EngineSchema, EngineEvent>(
+    {
+      initial: 'idle',
+      states: {
+        idle: {
+          on: {
+            START: 'running',
+          },
+        },
+        running: {
+          on: {
+            PAUSE: 'paused',
+            STOP: 'stopped',
+          },
+          onEntry: 'startEngine',
+        },
+        paused: {
+          on: {
+            RESUME: 'running',
+            STOP: 'stopped',
+          },
+          onEntry: 'pauseEngine',
+        },
+        stopped: {
+          on: {
+            START: 'running',
+          },
+          onEntry: 'stopEngine',
+        },
+      },
+    },
+    {
+      actions: {
+        startEngine: () => {
+          stopTimer = startTimer();
+          unbind = bindKeys({ element, bindings });
+        },
+        pauseEngine: () => {
+          stopTimer();
+          unbind();
+        },
+        stopEngine: () => {
+          stopTimer();
+          unbind();
+          onStop();
+        },
+      },
+    }
+  );
+
+  const interpreter = interpret(engineMachine)
+    .start()
+    .onTransition(state => {
+      if (state.changed) {
+        onStatusChanged(state.value);
+      }
+    });
 
   let unbind: () => void;
   let startTimer = createTimer({
     step,
     onTick,
     onUpdate: () => {
-      onUpdate(status);
+      onUpdate();
     },
   });
   let stopTimer: () => void;
 
-  const actionMap = new Map([
-    [
-      'startEngine',
-      () => {
-        stopTimer = startTimer();
-        unbind = bindKeys({ element, bindings });
-      },
-    ],
-    [
-      'pauseEngine',
-      () => {
-        stopTimer();
-        unbind();
-      },
-    ],
-    [
-      'stopEngine',
-      () => {
-        stopTimer();
-        unbind();
-      },
-    ],
-  ]);
-
-  const dispatch = (event: EngineEvent) => {
-    const nextState = engineMachine.transition(status, event);
-
-    nextState.actions.forEach(({ type }) => {
-      const action = actionMap.get(type);
-
-      if (action) {
-        action();
-      }
-    });
-
-    status = nextState.value;
-  };
-
   return {
-    getStatus: () => status,
     start() {
-      dispatch({ type: 'START' });
+      interpreter.send('START');
     },
     pause() {
-      dispatch({ type: 'PAUSE' });
+      interpreter.send('PAUSE');
     },
     resume() {
-      dispatch({ type: 'RESUME' });
+      interpreter.send('RESUME');
     },
     stop() {
-      dispatch({ type: 'STOP' });
+      interpreter.send('STOP');
     },
   };
 };

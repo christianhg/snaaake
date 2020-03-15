@@ -3,10 +3,30 @@ import { StateSchema, Machine, interpret, Interpreter, assign } from 'xstate';
 interface SnakeStateSchema extends StateSchema {
   states: {
     idle: {};
-    up: {};
-    right: {};
-    down: {};
-    left: {};
+    up: {
+      states: {
+        locked: {};
+        unlocked: {};
+      };
+    };
+    right: {
+      states: {
+        locked: {};
+        unlocked: {};
+      };
+    };
+    down: {
+      states: {
+        locked: {};
+        unlocked: {};
+      };
+    };
+    left: {
+      states: {
+        locked: {};
+        unlocked: {};
+      };
+    };
     dead: {};
   };
 }
@@ -99,11 +119,17 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
     SnakeEvent
   >(
     {
+      id: 'snake',
       context,
       initial: 'idle',
+      on: {
+        RESTART: {
+          target: 'idle',
+        },
+      },
       states: {
         idle: {
-          onEntry: 'resetSnake',
+          onEntry: ['resetSnake', 'notifyUpdate'],
           on: {
             UP: { target: 'up' },
             RIGHT: { target: 'right' },
@@ -113,59 +139,102 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
         },
         up: {
           on: {
-            RIGHT: { target: 'right' },
-            LEFT: { target: 'left' },
             TICK: [
               { target: 'dead', cond: 'boundUp' },
               { target: 'dead', cond: 'snakeUp' },
-              { cond: 'appleUp', actions: ['growUp', 'notifyUpdate'] },
-              { actions: ['moveUp', 'notifyUpdate'] },
+              {
+                cond: 'appleUp',
+                target: '.unlocked',
+                actions: ['growUp', 'notifyUpdate'],
+              },
+              { target: '.unlocked', actions: ['moveUp', 'notifyUpdate'] },
             ],
+          },
+          initial: 'locked',
+          states: {
+            locked: {},
+            unlocked: {
+              on: {
+                RIGHT: { target: '#snake.right' },
+                LEFT: { target: '#snake.left' },
+              },
+            },
           },
         },
         right: {
           on: {
-            UP: { target: 'up' },
-            DOWN: { target: 'down' },
             TICK: [
               { target: 'dead', cond: 'boundRight' },
               { target: 'dead', cond: 'snakeRight' },
-              { cond: 'appleRight', actions: ['growRight', 'notifyUpdate'] },
-              { actions: ['moveRight', 'notifyUpdate'] },
+              {
+                cond: 'appleRight',
+                target: '.unlocked',
+                actions: ['growRight', 'notifyUpdate'],
+              },
+              { target: '.unlocked', actions: ['moveRight', 'notifyUpdate'] },
             ],
+          },
+          initial: 'locked',
+          states: {
+            locked: {},
+            unlocked: {
+              on: {
+                UP: { target: '#snake.up' },
+                DOWN: { target: '#snake.down' },
+              },
+            },
           },
         },
         down: {
           on: {
-            RIGHT: { target: 'right' },
-            LEFT: { target: 'left' },
             TICK: [
               { target: 'dead', cond: 'boundDown' },
               { target: 'dead', cond: 'snakeDown' },
-              { cond: 'appleDown', actions: ['growDown', 'notifyUpdate'] },
-              { actions: ['moveDown', 'notifyUpdate'] },
+              {
+                cond: 'appleDown',
+                target: '.unlocked',
+                actions: ['growDown', 'notifyUpdate'],
+              },
+              { target: '.unlocked', actions: ['moveDown', 'notifyUpdate'] },
             ],
+          },
+          initial: 'locked',
+          states: {
+            locked: {},
+            unlocked: {
+              on: {
+                RIGHT: { target: '#snake.right' },
+                LEFT: { target: '#snake.left' },
+              },
+            },
           },
         },
         left: {
           on: {
-            UP: { target: 'up' },
-            DOWN: { target: 'down' },
             TICK: [
               { target: 'dead', cond: 'boundLeft' },
               { target: 'dead', cond: 'snakeLeft' },
-              { cond: 'appleLeft', actions: ['growLeft', 'notifyUpdate'] },
-              { actions: ['moveLeft', 'notifyUpdate'] },
+              {
+                cond: 'appleLeft',
+                target: '.unlocked',
+                actions: ['growLeft', 'notifyUpdate'],
+              },
+              { target: '.unlocked', actions: ['moveLeft', 'notifyUpdate'] },
             ],
+          },
+          initial: 'locked',
+          states: {
+            locked: {},
+            unlocked: {
+              on: {
+                UP: { target: '#snake.up' },
+                DOWN: { target: '#snake.down' },
+              },
+            },
           },
         },
         dead: {
           entry: 'notifyDead',
-          on: {
-            RESTART: {
-              target: 'idle',
-            },
-          },
         },
       },
     },
