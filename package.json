@@ -20,8 +20,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "npm run prettier-production && react-scripts build",
-    "test": "react-scripts test",
+    "build": "npm run prettier-production && npm test && react-scripts build",
+    "test": "react-scripts test --watchAll=false",
+    "test-watch": "react-scripts test",
     "eject": "react-scripts eject",
     "prettier": "prettier --write {*,**/*}.{css,html,js,ts,tsx}",
     "prettier-production": "prettier --list-different {*,**/*}.{css,html,js,ts,tsx}"
