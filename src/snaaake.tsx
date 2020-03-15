@@ -21,7 +21,7 @@ type State = { apples: Apples; bounds: Bounds; snake: Snake };
 
 export class Snaaake extends Component<
   {},
-  { game: { state: State; status: StateValue } }
+  { game: { scale: number; state: State; status: StateValue } }
 > {
   private engine: Engine;
   private snakeMachine: SnakeMachine<Apples, Bounds, Snake>;
@@ -31,9 +31,10 @@ export class Snaaake extends Component<
 
     this.state = {
       game: {
+        scale: 20,
         state: {
           apples: [[10, 10]],
-          bounds: createBounds({ width: 48, height: 48 }),
+          bounds: createBounds({ width: 24, height: 24 }),
           snake: [
             [0, 0],
             [0, 1],
@@ -163,17 +164,18 @@ export class Snaaake extends Component<
             this.state.game.state.bounds[
               this.state.game.state.bounds.length - 1
             ][0] *
-              10 +
-            10
+              this.state.game.scale +
+            this.state.game.scale
           }
           height={
             this.state.game.state.bounds[
               this.state.game.state.bounds.length - 1
             ][1] *
-              10 +
-            10
+              this.state.game.scale +
+            this.state.game.scale
           }
           state={this.state.game.state}
+          scale={this.state.game.scale}
           draw={drawScene}
         />
       </div>
