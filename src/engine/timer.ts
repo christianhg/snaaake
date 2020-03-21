@@ -1,36 +1,28 @@
-type Timer = () => () => void;
+type Timer = () => void;
 
 export const createTimer = <State>({
   step,
   onTick,
-  onUpdate,
 }: {
   step: number;
   onTick: () => void;
-  onUpdate: () => void;
 }): Timer => () => {
-  let lastTime = 0;
   let accumulatedTime = 0;
-  let frameId: number;
+  let lastTime = 0;
 
-  const animate = (time: number) => {
-    if (lastTime) {
-      accumulatedTime = accumulatedTime + (time - lastTime) / 1000;
+  const animate = (time: number = 0) => {
+    accumulatedTime += (time - lastTime) / 1000;
 
-      while (accumulatedTime >= step) {
-        accumulatedTime = accumulatedTime - step;
+    while (accumulatedTime > step) {
+      onTick();
 
-        onTick();
-      }
+      accumulatedTime = accumulatedTime - step;
     }
 
-    onUpdate();
-
     lastTime = time;
-    frameId = requestAnimationFrame(animate);
+
+    requestAnimationFrame(animate);
   };
 
-  frameId = requestAnimationFrame(animate);
-
-  return () => cancelAnimationFrame(frameId);
+  requestAnimationFrame(animate);
 };

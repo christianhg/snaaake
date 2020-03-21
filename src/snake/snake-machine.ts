@@ -1,33 +1,46 @@
-import { StateSchema, Machine, interpret, Interpreter, assign } from 'xstate';
+import {
+  StateSchema,
+  Machine,
+  interpret,
+  Interpreter,
+  assign,
+  StateValue,
+} from 'xstate';
+import { createTimer } from '../engine/timer';
 
 interface SnakeStateSchema extends StateSchema {
   states: {
     idle: {};
-    up: {
+    moving: {
       states: {
-        locked: {};
-        unlocked: {};
-      };
-    };
-    right: {
-      states: {
-        locked: {};
-        unlocked: {};
-      };
-    };
-    down: {
-      states: {
-        locked: {};
-        unlocked: {};
-      };
-    };
-    left: {
-      states: {
-        locked: {};
-        unlocked: {};
+        up: {
+          states: {
+            locked: {};
+            unlocked: {};
+          };
+        };
+        right: {
+          states: {
+            locked: {};
+            unlocked: {};
+          };
+        };
+        down: {
+          states: {
+            locked: {};
+            unlocked: {};
+          };
+        };
+        left: {
+          states: {
+            locked: {};
+            unlocked: {};
+          };
+        };
       };
     };
     dead: {};
+    paused: {};
   };
 }
 
@@ -42,8 +55,9 @@ type SnakeEvent =
   | { type: 'RIGHT' }
   | { type: 'DOWN' }
   | { type: 'LEFT' }
-  | { type: 'TICK' }
-  | { type: 'RESTART' };
+  | { type: 'SPACE' }
+  | { type: 'ESCAPE' }
+  | { type: 'TICK' };
 
 export type SnakeMachine<TApples, TBounds, TSnake> = Interpreter<
   SnakeContext<TApples, TBounds, TSnake>,
@@ -94,7 +108,6 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
   move,
   grow,
   onUpdate,
-  onDead,
 }: {
   context: SnakeContext<TApples, TBounds, TSnake>;
   willExceedBounds: WillExceedBounds<TBounds, TSnake>;
@@ -110,8 +123,13 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
     snake: TSnake;
     direction: Direction;
   }) => { apples: TApples; snake: TSnake };
-  onUpdate: ({ apples, snake }: { apples: TApples; snake: TSnake }) => void;
-  onDead: () => void;
+  onUpdate: ({
+    context,
+    state,
+  }: {
+    context: SnakeContext<TApples, TBounds, TSnake>;
+    state: StateValue;
+  }) => void;
 }): SnakeMachine<TApples, TBounds, TSnake> {
   const machine = Machine<
     SnakeContext<TApples, TBounds, TSnake>,
@@ -122,119 +140,139 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
       id: 'snake',
       context,
       initial: 'idle',
-      on: {
-        RESTART: {
-          target: 'idle',
-          actions: ['resetSnake', 'notifyUpdate'],
-        },
-      },
       states: {
         idle: {
           on: {
-            UP: { target: 'up' },
-            RIGHT: { target: 'right' },
-            DOWN: { target: 'down' },
-            LEFT: { target: 'left' },
+            UP: { target: 'moving.up' },
+            RIGHT: { target: 'moving.right' },
+            DOWN: { target: 'moving.down' },
+            LEFT: { target: 'moving.left' },
           },
         },
-        up: {
+        moving: {
           on: {
-            TICK: [
-              { target: 'dead', cond: 'boundUp' },
-              { target: 'dead', cond: 'snakeUp' },
-              {
-                cond: 'appleUp',
-                target: '.unlocked',
-                actions: ['growUp', 'notifyUpdate'],
-              },
-              { target: '.unlocked', actions: ['moveUp', 'notifyUpdate'] },
-            ],
-          },
-          initial: 'locked',
-          states: {
-            locked: {},
-            unlocked: {
-              on: {
-                RIGHT: { target: '#snake.right' },
-                LEFT: { target: '#snake.left' },
-              },
+            SPACE: {
+              target: '#snake.paused',
             },
           },
-        },
-        right: {
-          on: {
-            TICK: [
-              { target: 'dead', cond: 'boundRight' },
-              { target: 'dead', cond: 'snakeRight' },
-              {
-                cond: 'appleRight',
-                target: '.unlocked',
-                actions: ['growRight', 'notifyUpdate'],
-              },
-              { target: '.unlocked', actions: ['moveRight', 'notifyUpdate'] },
-            ],
-          },
-          initial: 'locked',
           states: {
-            locked: {},
-            unlocked: {
+            up: {
               on: {
-                UP: { target: '#snake.up' },
-                DOWN: { target: '#snake.down' },
+                TICK: [
+                  { target: '#snake.dead', cond: 'boundUp' },
+                  { target: '#snake.dead', cond: 'snakeUp' },
+                  {
+                    cond: 'appleUp',
+                    target: '.unlocked',
+                    actions: ['growUp'],
+                  },
+                  { target: '.unlocked', actions: ['moveUp'] },
+                ],
+              },
+              initial: 'locked',
+              states: {
+                locked: {},
+                unlocked: {
+                  on: {
+                    RIGHT: { target: '#snake.moving.right' },
+                    LEFT: { target: '#snake.moving.left' },
+                  },
+                },
               },
             },
-          },
-        },
-        down: {
-          on: {
-            TICK: [
-              { target: 'dead', cond: 'boundDown' },
-              { target: 'dead', cond: 'snakeDown' },
-              {
-                cond: 'appleDown',
-                target: '.unlocked',
-                actions: ['growDown', 'notifyUpdate'],
-              },
-              { target: '.unlocked', actions: ['moveDown', 'notifyUpdate'] },
-            ],
-          },
-          initial: 'locked',
-          states: {
-            locked: {},
-            unlocked: {
+            right: {
               on: {
-                RIGHT: { target: '#snake.right' },
-                LEFT: { target: '#snake.left' },
+                TICK: [
+                  { target: '#snake.dead', cond: 'boundRight' },
+                  { target: '#snake.dead', cond: 'snakeRight' },
+                  {
+                    cond: 'appleRight',
+                    target: '.unlocked',
+                    actions: ['growRight'],
+                  },
+                  {
+                    target: '.unlocked',
+                    actions: ['moveRight'],
+                  },
+                ],
+              },
+              initial: 'locked',
+              states: {
+                locked: {},
+                unlocked: {
+                  on: {
+                    UP: { target: '#snake.moving.up' },
+                    DOWN: { target: '#snake.moving.down' },
+                  },
+                },
               },
             },
-          },
-        },
-        left: {
-          on: {
-            TICK: [
-              { target: 'dead', cond: 'boundLeft' },
-              { target: 'dead', cond: 'snakeLeft' },
-              {
-                cond: 'appleLeft',
-                target: '.unlocked',
-                actions: ['growLeft', 'notifyUpdate'],
-              },
-              { target: '.unlocked', actions: ['moveLeft', 'notifyUpdate'] },
-            ],
-          },
-          initial: 'locked',
-          states: {
-            locked: {},
-            unlocked: {
+            down: {
               on: {
-                UP: { target: '#snake.up' },
-                DOWN: { target: '#snake.down' },
+                TICK: [
+                  { target: '#snake.dead', cond: 'boundDown' },
+                  { target: '#snake.dead', cond: 'snakeDown' },
+                  {
+                    cond: 'appleDown',
+                    target: '.unlocked',
+                    actions: ['growDown'],
+                  },
+                  {
+                    target: '.unlocked',
+                    actions: ['moveDown'],
+                  },
+                ],
+              },
+              initial: 'locked',
+              states: {
+                locked: {},
+                unlocked: {
+                  on: {
+                    RIGHT: { target: '#snake.moving.right' },
+                    LEFT: { target: '#snake.moving.left' },
+                  },
+                },
+              },
+            },
+            left: {
+              on: {
+                TICK: [
+                  { target: '#snake.dead', cond: 'boundLeft' },
+                  { target: '#snake.dead', cond: 'snakeLeft' },
+                  {
+                    cond: 'appleLeft',
+                    target: '.unlocked',
+                    actions: ['growLeft'],
+                  },
+                  {
+                    target: '.unlocked',
+                    actions: ['moveLeft'],
+                  },
+                ],
+              },
+              initial: 'locked',
+              states: {
+                locked: {},
+                unlocked: {
+                  on: {
+                    UP: { target: '#snake.moving.up' },
+                    DOWN: { target: '#snake.moving.down' },
+                  },
+                },
               },
             },
           },
         },
         dead: {
-          entry: 'notifyDead',
+          on: {
+            SPACE: { target: 'idle', actions: ['reset'] },
+          },
+        },
+        paused: {
+          on: {
+            SPACE: { target: 'idle' },
+            ESCAPE: { target: 'idle', actions: ['reset'] },
+          },
         },
       },
     },
@@ -278,9 +316,8 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
             grow({ apples, snake, direction: Direction.left }).snake,
         }),
 
-        notifyUpdate: ({ apples, snake }) => onUpdate({ apples, snake }),
-        notifyDead: onDead,
-        resetSnake: assign({
+        reset: assign({
+          apples: ({ apples }) => context.apples,
           snake: ({ snake }) => context.snake,
         }),
       },
@@ -315,7 +352,20 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
     }
   );
 
-  const interpreter = interpret(machine).start();
+  const interpreter = interpret(machine)
+    .start()
+    .onTransition(state => {
+      if (state.changed !== undefined) {
+        onUpdate({ context: state.context, state: state.value });
+      }
+    });
+
+  createTimer({
+    step: 1 / 8,
+    onTick: () => {
+      interpreter.send('TICK');
+    },
+  })();
 
   return interpreter;
 }

@@ -1,7 +1,6 @@
 import 'modern-normalize';
 import React, { Component } from 'react';
 import { Canvas } from './engine/canvas';
-import { createEngine, Engine } from './engine/engine';
 import { StateValue } from 'xstate';
 import { SnakeMachine, createSnakeMachine } from './snake/snake-machine';
 import {
@@ -16,6 +15,7 @@ import {
   growSnake,
 } from './snake/snake';
 import { drawScene } from './snake/draw-snake';
+import { bindKeys } from './engine/keyboard';
 
 type State = { apples: Apples; bounds: Bounds; snake: Snake };
 
@@ -23,7 +23,6 @@ export class Snaaake extends Component<
   {},
   { game: { scale: number; state: State; status: StateValue } }
 > {
-  private engine: Engine;
   private snakeMachine: SnakeMachine<Apples, Bounds, Snake>;
 
   constructor(props: {}) {
@@ -45,15 +44,6 @@ export class Snaaake extends Component<
       },
     };
 
-    let nextState: { apples: Apples; snake: Snake } = {
-      apples: [[10, 10]],
-      snake: [
-        [0, 0],
-        [0, 1],
-        [1, 1],
-      ],
-    };
-
     this.snakeMachine = createSnakeMachine<Apples, Bounds, Snake>({
       context: this.state.game.state,
       willExceedBounds,
@@ -61,81 +51,75 @@ export class Snaaake extends Component<
       willHitItself,
       move: moveSnake,
       grow: growSnake,
-      onDead: () => {},
-      onUpdate: ({ apples, snake }) => {
-        nextState = { apples, snake };
+      onUpdate: ({ context, state }) => {
+        this.setState({
+          game: {
+            ...this.state.game,
+            state: context,
+            // status: state
+          },
+        });
       },
     });
 
-    this.engine = createEngine({
-      step: 1 / 8,
-      onTick: () => {
-        this.snakeMachine.send('TICK');
-      },
-      onUpdate: () => {
-        this.setState({
-          game: {
-            ...this.state.game,
-            state: {
-              ...this.state.game.state,
-              apples: nextState.apples,
-              snake: nextState.snake,
+    bindKeys({
+      element: window,
+      bindings: new Map([
+        [
+          [' '],
+          {
+            down: () => {
+              this.snakeMachine.send('SPACE');
             },
+            up: () => {},
           },
-        });
-      },
-      onStatusChanged: status => {
-        this.setState({
-          game: {
-            ...this.state.game,
-            status,
+        ],
+        [
+          ['Escape'],
+          {
+            down: () => {
+              this.snakeMachine.send('ESCAPE');
+            },
+            up: () => {},
           },
-        });
-      },
-      onStop: () => {
-        this.snakeMachine.send('RESTART');
-      },
-      keyBindings: {
-        element: window,
-        bindings: new Map([
-          [
-            ['w', 'ArrowUp'],
-            {
-              down: () => {
-                this.snakeMachine.send('UP');
-              },
-              up: () => {},
+        ],
+        [
+          ['w', 'ArrowUp'],
+          {
+            down: () => {
+              this.snakeMachine.send('UP');
             },
-          ],
-          [
-            ['d', 'ArrowRight'],
-            {
-              down: () => {
-                this.snakeMachine.send('RIGHT');
-              },
-              up: () => {},
+            up: () => {},
+          },
+        ],
+        [
+          ['d', 'ArrowRight'],
+          {
+            down: () => {
+              this.snakeMachine.send('RIGHT');
             },
-          ],
-          [
-            ['s', 'ArrowDown'],
-            {
-              down: () => {
-                this.snakeMachine.send('DOWN');
-              },
-              up: () => {},
+            up: () => {},
+          },
+        ],
+        [
+          ['s', 'ArrowDown'],
+          {
+            down: () => {
+              this.snakeMachine.send('DOWN');
             },
-          ],
-          [
-            ['a', 'ArrowLeft'],
-            {
-              down: () => {
-                this.snakeMachine.send('LEFT');
-              },
-              up: () => {},
+            up: () => {},
+          },
+        ],
+        [
+          ['a', 'ArrowLeft'],
+          {
+            down: () => {
+              this.snakeMachine.send('LEFT');
             },
-          ],
-        ]),
-      },
+            up: () => {},
+          },
+        ],
+      ]),
     });
   }
 
@@ -145,20 +129,6 @@ export class Snaaake extends Component<
         <p>
           Current status: <b>{this.state.game.status}</b>
         </p>
-        {(this.state.game.status === 'idle' ||
-          this.state.game.status === 'stopped') && (
-          <button onClick={() => this.engine.start()}>Start</button>
-        )}
-        {this.state.game.status === 'running' && (
-          <button onClick={() => this.engine.pause()}>Pause</button>
-        )}
-        {this.state.game.status === 'paused' && (
-          <button onClick={() => this.engine.resume()}>Resume</button>
-        )}
-        {(this.state.game.status === 'running' ||
-          this.state.game.status === 'paused') && (
-          <button onClick={() => this.engine.stop()}>Stop</button>
-        )}
         <Canvas
           width={
             this.state.game.state.bounds[
