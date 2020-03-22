@@ -4,9 +4,8 @@ import {
   interpret,
   Interpreter,
   assign,
-  StateValue,
+  StateMachine,
 } from 'xstate';
-import { createTimer } from '../engine/timer';
 
 interface SnakeStateSchema extends StateSchema {
   states: {
@@ -58,6 +57,14 @@ type SnakeEvent =
   | { type: 'SPACE' }
   | { type: 'ESCAPE' }
   | { type: 'TICK' };
+
+export type SnakeMachineState<TApples, TBounds, TSnake> = NonNullable<
+  StateMachine<
+    SnakeContext<TApples, TBounds, TSnake>,
+    SnakeStateSchema,
+    SnakeEvent
+  >['initial']
+>;
 
 export type SnakeMachine<TApples, TBounds, TSnake> = Interpreter<
   SnakeContext<TApples, TBounds, TSnake>,
@@ -127,8 +134,8 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
     context,
     state,
   }: {
-    context: SnakeContext<TApples, TBounds, TSnake>;
-    state: StateValue;
+    context: Omit<SnakeContext<TApples, TBounds, TSnake>, 'bounds'>;
+    state: SnakeMachineState<TApples, TBounds, TSnake>;
   }) => void;
 }): SnakeMachine<TApples, TBounds, TSnake> {
   const machine = Machine<
@@ -164,9 +171,9 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
                   {
                     cond: 'appleUp',
                     target: '.unlocked',
-                    actions: ['growUp'],
+                    actions: ['growUp', 'notifyUpdate'],
                   },
-                  { target: '.unlocked', actions: ['moveUp'] },
+                  { target: '.unlocked', actions: ['moveUp', 'notifyUpdate'] },
                 ],
               },
               initial: 'locked',
@@ -188,11 +195,11 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
                   {
                     cond: 'appleRight',
                     target: '.unlocked',
-                    actions: ['growRight'],
+                    actions: ['growRight', 'notifyUpdate'],
                   },
                   {
                     target: '.unlocked',
-                    actions: ['moveRight'],
+                    actions: ['moveRight', 'notifyUpdate'],
                   },
                 ],
               },
@@ -215,11 +222,11 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
                   {
                     cond: 'appleDown',
                     target: '.unlocked',
-                    actions: ['growDown'],
+                    actions: ['growDown', 'notifyUpdate'],
                   },
                   {
                     target: '.unlocked',
-                    actions: ['moveDown'],
+                    actions: ['moveDown', 'notifyUpdate'],
                   },
                 ],
               },
@@ -242,11 +249,11 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
                   {
                     cond: 'appleLeft',
                     target: '.unlocked',
-                    actions: ['growLeft'],
+                    actions: ['growLeft', 'notifyUpdate'],
                   },
                   {
                     target: '.unlocked',
-                    actions: ['moveLeft'],
+                    actions: ['moveLeft', 'notifyUpdate'],
                   },
                 ],
               },
@@ -264,14 +271,16 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
           },
         },
         dead: {
+          entry: ['notifyUpdate'],
           on: {
-            SPACE: { target: 'idle', actions: ['reset'] },
+            SPACE: { target: 'idle', actions: ['reset', 'notifyUpdate'] },
           },
         },
         paused: {
+          entry: ['notifyUpdate'],
           on: {
-            SPACE: { target: 'idle' },
-            ESCAPE: { target: 'idle', actions: ['reset'] },
+            SPACE: { target: 'idle', actions: ['notifyUpdate'] },
+            ESCAPE: { target: 'idle', actions: ['reset', 'notifyUpdate'] },
           },
         },
       },
@@ -316,6 +325,19 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
             grow({ apples, snake, direction: Direction.left }).snake,
         }),
 
+        notifyUpdate: ({ apples, snake }, event, meta) => {
+          onUpdate({
+            context: { apples, snake },
+            state: (typeof meta.state.value === 'string'
+              ? meta.state.value
+              : Object.keys(meta.state.value)[0]) as SnakeMachineState<
+              TApples,
+              TBounds,
+              TSnake
+            >,
+          });
+        },
+
         reset: assign({
           apples: ({ apples }) => context.apples,
           snake: ({ snake }) => context.snake,
@@ -352,20 +374,7 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
     }
   );
 
-  const interpreter = interpret(machine)
-    .start()
-    .onTransition(state => {
-      if (state.changed !== undefined) {
-        onUpdate({ context: state.context, state: state.value });
-      }
-    });
-
-  createTimer({
-    step: 1 / 8,
-    onTick: () => {
-      interpreter.send('TICK');
-    },
-  })();
+  const interpreter = interpret(machine).start();
 
   return interpreter;
 }

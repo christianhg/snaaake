@@ -1,8 +1,11 @@
 import 'modern-normalize';
 import React, { Component } from 'react';
 import { Canvas } from './engine/canvas';
-import { StateValue } from 'xstate';
-import { SnakeMachine, createSnakeMachine } from './snake/snake-machine';
+import {
+  SnakeMachine,
+  SnakeMachineState,
+  createSnakeMachine,
+} from './snake/snake-machine';
 import {
   Apples,
   Bounds,
@@ -16,12 +19,19 @@ import {
 } from './snake/snake';
 import { drawScene } from './snake/draw-snake';
 import { bindKeys } from './engine/keyboard';
+import { createTimer } from './engine/timer';
 
 type State = { apples: Apples; bounds: Bounds; snake: Snake };
 
 export class Snaaake extends Component<
   {},
-  { game: { scale: number; state: State; status: StateValue } }
+  {
+    game: {
+      scale: number;
+      state: State;
+      status: SnakeMachineState<Apples, Bounds, Snake>;
+    };
+  }
 > {
   private snakeMachine: SnakeMachine<Apples, Bounds, Snake>;
 
@@ -55,8 +65,12 @@ export class Snaaake extends Component<
         this.setState({
           game: {
             ...this.state.game,
-            state: context,
-            // status: state
+            state: {
+              ...this.state.game.state,
+              apples: context.apples,
+              snake: context.snake,
+            },
+            status: state,
           },
         });
       },
@@ -121,6 +135,15 @@ export class Snaaake extends Component<
         ],
       ]),
     });
+  }
+
+  componentDidMount() {
+    createTimer({
+      step: 1 / 8,
+      onTick: () => {
+        this.snakeMachine.send('TICK');
+      },
+    })();
   }
 
   render() {

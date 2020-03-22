@@ -64,12 +64,10 @@ const bounds: Bounds = [
 
 describe(createSnakeMachine.name, () => {
   let onUpdate: jest.Mock;
-  let onDead: jest.Mock;
   let snakeMachine: SnakeMachine<Apples, Bounds, Snake>;
 
   beforeEach(() => {
     onUpdate = jest.fn();
-    onDead = jest.fn();
 
     snakeMachine = createSnakeMachine<Apples, Bounds, Snake>({
       context: {
@@ -87,7 +85,6 @@ describe(createSnakeMachine.name, () => {
       move: moveSnake,
       grow: growSnake,
       onUpdate,
-      onDead,
     });
   });
 
@@ -105,30 +102,49 @@ describe(createSnakeMachine.name, () => {
     snakeMachine.send('TICK');
 
     expect(onUpdate).toHaveBeenNthCalledWith(1, {
-      apples: [
-        [5, 3],
-        [2, 3],
-        [3, 4],
-      ],
-      snake: [[3, 2]],
+      context: {
+        apples: [
+          [5, 3],
+          [2, 3],
+          [3, 4],
+        ],
+        snake: [[3, 2]],
+      },
+      state: 'moving',
     });
     expect(onUpdate).toHaveBeenNthCalledWith(2, {
-      apples: [
-        [5, 3],
-        [2, 3],
-        [3, 4],
-      ],
-      snake: [[3, 1]],
+      context: {
+        apples: [
+          [5, 3],
+          [2, 3],
+          [3, 4],
+        ],
+        snake: [[3, 1]],
+      },
+      state: 'moving',
     });
     expect(onUpdate).toHaveBeenNthCalledWith(3, {
-      apples: [
-        [5, 3],
-        [2, 3],
-        [3, 4],
-      ],
-      snake: [[3, 0]],
+      context: {
+        apples: [
+          [5, 3],
+          [2, 3],
+          [3, 4],
+        ],
+        snake: [[3, 0]],
+      },
+      state: 'moving',
     });
-    expect(onDead).toHaveBeenCalled();
+    expect(onUpdate).toHaveBeenNthCalledWith(4, {
+      context: {
+        apples: [
+          [5, 3],
+          [2, 3],
+          [3, 4],
+        ],
+        snake: [[3, 0]],
+      },
+      state: 'dead',
+    });
   });
 
   it('can grow', () => {
@@ -137,22 +153,28 @@ describe(createSnakeMachine.name, () => {
     snakeMachine.send('TICK');
 
     expect(onUpdate).toHaveBeenNthCalledWith(1, {
-      apples: [
-        [5, 3],
-        [2, 3],
-        [3, 4],
-      ],
-      snake: [[4, 3]],
+      context: {
+        apples: [
+          [5, 3],
+          [2, 3],
+          [3, 4],
+        ],
+        snake: [[4, 3]],
+      },
+      state: 'moving',
     });
     expect(onUpdate).toHaveBeenNthCalledWith(2, {
-      apples: [
-        [2, 3],
-        [3, 4],
-      ],
-      snake: [
-        [5, 3],
-        [4, 3],
-      ],
+      context: {
+        apples: [
+          [2, 3],
+          [3, 4],
+        ],
+        snake: [
+          [5, 3],
+          [4, 3],
+        ],
+      },
+      state: 'moving',
     });
   });
 
@@ -161,40 +183,49 @@ describe(createSnakeMachine.name, () => {
     snakeMachine.send('TICK');
 
     expect(onUpdate).toHaveBeenNthCalledWith(1, {
-      apples: [
-        [5, 3],
-        [3, 4],
-      ],
-      snake: [
-        [2, 3],
-        [3, 3],
-      ],
+      context: {
+        apples: [
+          [5, 3],
+          [3, 4],
+        ],
+        snake: [
+          [2, 3],
+          [3, 3],
+        ],
+      },
+      state: 'moving',
     });
 
     snakeMachine.send('DOWN');
     snakeMachine.send('TICK');
 
     expect(onUpdate).toHaveBeenNthCalledWith(2, {
-      apples: [
-        [5, 3],
-        [3, 4],
-      ],
-      snake: [
-        [2, 4],
-        [2, 3],
-      ],
+      context: {
+        apples: [
+          [5, 3],
+          [3, 4],
+        ],
+        snake: [
+          [2, 4],
+          [2, 3],
+        ],
+      },
+      state: 'moving',
     });
 
     snakeMachine.send('RIGHT');
     snakeMachine.send('TICK');
 
     expect(onUpdate).toHaveBeenNthCalledWith(3, {
-      apples: [[5, 3]],
-      snake: [
-        [3, 4],
-        [2, 4],
-        [2, 3],
-      ],
+      context: {
+        apples: [[5, 3]],
+        snake: [
+          [3, 4],
+          [2, 4],
+          [2, 3],
+        ],
+      },
+      state: 'moving',
     });
   });
 });
