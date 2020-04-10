@@ -23,8 +23,10 @@ import { createTimer } from './engine/timer';
 
 type State = { apples: Apples; bounds: Bounds; snake: Snake };
 
+type SnaaakeProps = { width: number; height: number; scale: number };
+
 export class Snaaake extends Component<
-  {},
+  SnaaakeProps,
   {
     game: {
       scale: number;
@@ -35,15 +37,17 @@ export class Snaaake extends Component<
 > {
   private snakeMachine: SnakeMachine<Apples, Bounds, Snake>;
 
-  constructor(props: {}) {
+  constructor(props: SnaaakeProps) {
     super(props);
+
+    const { width, height, scale } = props;
 
     this.state = {
       game: {
-        scale: 20,
+        scale,
         state: {
           apples: [[10, 10]],
-          bounds: createBounds({ width: 24, height: 24 }),
+          bounds: createBounds({ width, height }),
           snake: [
             [0, 0],
             [0, 1],
