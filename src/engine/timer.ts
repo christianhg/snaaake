@@ -1,12 +1,10 @@
-type Timer = () => void;
-
-export const createTimer = <State>({
+export function createTimer({
   step,
   onTick,
 }: {
   step: number;
   onTick: () => void;
-}): Timer => () => {
+}): void {
   let accumulatedTime = 0;
   let lastTime = 0;
 
@@ -25,4 +23,4 @@ export const createTimer = <State>({
   };
 
   requestAnimationFrame(animate);
-};
+}

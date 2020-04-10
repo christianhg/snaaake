@@ -147,7 +147,7 @@ export class Snaaake extends Component<
       onTick: () => {
         this.snakeMachine.send('TICK');
       },
-    })();
+    });
   }
 
   render() {
