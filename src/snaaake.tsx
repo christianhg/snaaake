@@ -82,14 +82,13 @@ export class Snaaake extends Component<
 
     bindKeys({
       element: window,
-      bindings: new Map([
+      handlers: new Map([
         [
           [' '],
           {
             down: () => {
               this.snakeMachine.send('SPACE');
             },
-            up: () => {},
           },
         ],
         [
@@ -98,7 +97,6 @@ export class Snaaake extends Component<
             down: () => {
               this.snakeMachine.send('ESCAPE');
             },
-            up: () => {},
           },
         ],
         [
@@ -107,7 +105,6 @@ export class Snaaake extends Component<
             down: () => {
               this.snakeMachine.send('UP');
             },
-            up: () => {},
           },
         ],
         [
@@ -116,7 +113,6 @@ export class Snaaake extends Component<
             down: () => {
               this.snakeMachine.send('RIGHT');
             },
-            up: () => {},
           },
         ],
         [
@@ -125,7 +121,6 @@ export class Snaaake extends Component<
             down: () => {
               this.snakeMachine.send('DOWN');
             },
-            up: () => {},
           },
         ],
         [
@@ -134,7 +129,6 @@ export class Snaaake extends Component<
             down: () => {
               this.snakeMachine.send('LEFT');
             },
-            up: () => {},
           },
         ],
       ]),

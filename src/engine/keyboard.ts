@@ -1,26 +1,32 @@
 export type Key = string;
 
-export type KeyEvents = {
-  down: () => void;
-  up: () => void;
+export type KeyEventHandler = {
+  down?: () => void;
+  up?: () => void;
 };
 
-export const bindKeys = ({
+export type KeyEventHandlers = Map<Key[], KeyEventHandler>;
+
+type KeyState = 'keyup' | 'keydown';
+
+export type UnbindKeys = () => void;
+
+export function bindKeys({
   element,
-  bindings,
+  handlers,
 }: {
   element: Window;
-  bindings: Map<Key[], KeyEvents>;
-}) => {
-  const keyStates = new Map<Key, 'keyup' | 'keydown'>();
+  handlers: KeyEventHandlers;
+}): UnbindKeys {
+  const keyStates = new Map<Key, KeyState>();
   const isDown = (key: Key) => keyStates.get(key) === 'keydown';
   const siblingsPressed = (keys: Key[], pressedKey: Key) =>
     keys
       .filter(key => key !== pressedKey)
       .filter(key => keyStates.get(key) === 'keydown').length > 0;
 
-  const keydown = (event: KeyboardEvent) => {
-    bindings.forEach(({ down }, keys) => {
+  const onKeydown = (event: KeyboardEvent) => {
+    handlers.forEach((handler, keys) => {
       const keyPressed = keys.find(key => key === event.key);
 
       if (
@@ -28,14 +34,14 @@ export const bindKeys = ({
         !siblingsPressed(keys, keyPressed) &&
         !isDown(keyPressed)
       ) {
-        down();
+        handler.down?.();
         keyStates.set(keyPressed, 'keydown');
       }
     });
   };
 
-  const keyup = (event: KeyboardEvent) => {
-    bindings.forEach(({ up }, keys) => {
+  const onKeyup = (event: KeyboardEvent) => {
+    handlers.forEach((handler, keys) => {
       const keyPressed = keys.find(key => key === event.key);
 
       if (
@@ -43,17 +49,17 @@ export const bindKeys = ({
         !siblingsPressed(keys, keyPressed) &&
         isDown(keyPressed)
       ) {
-        up();
+        handler.up?.();
         keyStates.set(keyPressed, 'keyup');
       }
     });
   };
 
-  element.addEventListener('keydown', keydown);
-  element.addEventListener('keyup', keyup);
+  element.addEventListener('keydown', onKeydown);
+  element.addEventListener('keyup', onKeyup);
 
   return () => {
-    element.removeEventListener('keydown', keydown);
-    element.removeEventListener('keyup', keyup);
+    element.removeEventListener('keydown', onKeydown);
+    element.removeEventListener('keyup', onKeyup);
   };
-};
+}
