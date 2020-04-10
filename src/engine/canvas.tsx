@@ -1,10 +1,14 @@
 import React, { useRef, useEffect } from 'react';
 
-export function Canvas<State>(scene: {
-  width: number;
-  height: number;
+export type CanvasSettings = { width: number; height: number; scale: number };
+
+export function Canvas<State>({
+  settings: { width, height, scale },
+  state,
+  draw,
+}: {
+  settings: CanvasSettings;
   state: State;
-  scale: number;
   draw: (
     state: State,
     scale: number,
@@ -19,9 +23,15 @@ export function Canvas<State>(scene: {
       : undefined;
 
     if (context) {
-      scene.draw(scene.state, scene.scale, context);
+      draw(state, scale, context);
     }
   });
 
-  return <canvas ref={canvasRef} height={scene.height} width={scene.width} />;
+  return (
+    <canvas
+      ref={canvasRef}
+      width={width * scale + scale}
+      height={height * scale + scale}
+    />
+  );
 }

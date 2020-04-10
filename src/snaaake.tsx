@@ -1,6 +1,6 @@
 import 'modern-normalize';
 import React, { Component } from 'react';
-import { Canvas } from './engine/canvas';
+import { Canvas, CanvasSettings } from './engine/canvas';
 import {
   SnakeMachine,
   SnakeMachineState,
@@ -21,45 +21,39 @@ import { drawScene } from './snake/draw-snake';
 import { bindKeys } from './engine/keyboard';
 import { createTimer } from './engine/timer';
 
-type State = { apples: Apples; bounds: Bounds; snake: Snake };
-
-type SnaaakeProps = { width: number; height: number; scale: number };
-
 export class Snaaake extends Component<
-  SnaaakeProps,
+  CanvasSettings,
   {
     game: {
-      scale: number;
-      state: State;
-      status: SnakeMachineState<Apples, Bounds, Snake>;
+      apples: Apples;
+      bounds: Bounds;
+      snake: Snake;
     };
+    status: SnakeMachineState<Apples, Bounds, Snake>;
   }
 > {
   private snakeMachine: SnakeMachine<Apples, Bounds, Snake>;
 
-  constructor(props: SnaaakeProps) {
+  constructor(props: CanvasSettings) {
     super(props);
 
-    const { width, height, scale } = props;
+    const { width, height } = props;
 
     this.state = {
       game: {
-        scale,
-        state: {
-          apples: [[10, 10]],
-          bounds: createBounds({ width, height }),
-          snake: [
-            [0, 0],
-            [0, 1],
-            [1, 1],
-          ],
-        },
-        status: 'idle',
+        apples: [[10, 10]],
+        bounds: createBounds({ width, height }),
+        snake: [
+          [0, 0],
+          [0, 1],
+          [1, 1],
+        ],
       },
+      status: 'idle',
     };
 
     this.snakeMachine = createSnakeMachine<Apples, Bounds, Snake>({
-      context: this.state.game.state,
+      context: this.state.game,
       willExceedBounds,
       willEatApple,
       willHitItself,
@@ -69,13 +63,10 @@ export class Snaaake extends Component<
         this.setState({
           game: {
             ...this.state.game,
-            state: {
-              ...this.state.game.state,
-              apples: context.apples,
-              snake: context.snake,
-            },
-            status: state,
+            apples: context.apples,
+            snake: context.snake,
           },
+          status: state,
         });
       },
     });
@@ -148,25 +139,11 @@ export class Snaaake extends Component<
     return (
       <div>
         <p>
-          Current status: <b>{this.state.game.status}</b>
+          Current status: <b>{this.state.status}</b>
         </p>
         <Canvas
-          width={
-            this.state.game.state.bounds[
-              this.state.game.state.bounds.length - 1
-            ][0] *
-              this.state.game.scale +
-            this.state.game.scale
-          }
-          height={
-            this.state.game.state.bounds[
-              this.state.game.state.bounds.length - 1
-            ][1] *
-              this.state.game.scale +
-            this.state.game.scale
-          }
-          state={this.state.game.state}
-          scale={this.state.game.scale}
+          settings={this.props}
+          state={this.state.game}
           draw={drawScene}
         />
       </div>
