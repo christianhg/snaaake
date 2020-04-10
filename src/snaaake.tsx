@@ -16,6 +16,7 @@ import {
   moveSnake,
   growSnake,
   getInitialSnakeState,
+  addApple,
 } from './snake/snake';
 import { drawScene } from './snake/draw-snake';
 import { bindKeys } from './engine/keyboard';
@@ -47,6 +48,7 @@ export class Snaaake extends Component<
     this.snakeMachine = createSnakeMachine<Apples, Bounds, Snake>({
       context: game,
       getNewContext: () => getInitialSnakeState(props),
+      updateApples: addApple,
       willExceedBounds,
       willEatApple,
       willHitItself,

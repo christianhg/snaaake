@@ -3,7 +3,8 @@ import { getRandomItem } from '../util/array';
 
 type Tuple<A, B> = [A, B];
 export type Coords = Tuple<number, number>;
-export type Apples = ReadonlyArray<Coords>;
+export type Apple = Coords;
+export type Apples = ReadonlyArray<Apple>;
 export type Bounds = ReadonlyArray<Coords>;
 export type Snake = ReadonlyArray<Coords>;
 export type SnakeState = {
@@ -34,16 +35,23 @@ export function createBounds({
   return bounds as Bounds;
 }
 
-function getFreeSquares({
+function getFreeSquares({ apples, bounds, snake }: SnakeState): Coords[] {
+  return bounds
+    .filter(
+      bound => !snake.some(part => part[0] === bound[0] && part[1] === bound[1])
+    )
+    .filter(
+      bound =>
+        !apples.some(apple => apple[0] === bound[0] && apple[1] === bound[1])
+    );
+}
+
+export function getApple({
+  apples,
   bounds,
   snake,
-}: {
-  bounds: Bounds;
-  snake: Snake;
-}): Coords[] {
-  return bounds.filter(
-    bound => !snake.some(part => part[0] === bound[0] && part[1] === bound[1])
-  );
+}: SnakeState): Apple | undefined {
+  return getRandomItem(getFreeSquares({ apples, bounds, snake }));
 }
 
 export function getInitialSnakeState({
@@ -52,20 +60,31 @@ export function getInitialSnakeState({
 }: {
   width: number;
   height: number;
-}): {
-  apples: Apples;
-  bounds: Bounds;
-  snake: Snake;
-} {
+}): SnakeState {
   const bounds = createBounds({ width, height });
-  const snake = [getRandomItem(bounds)];
-  const apples = [getRandomItem(getFreeSquares({ bounds, snake }))];
+  const snakePart = getRandomItem(bounds);
+
+  if (!snakePart) {
+    throw Error('Not enough room to create a snake');
+  }
+
+  const snake = [snakePart];
 
   return {
-    apples,
+    apples: addApple({ apples: [], bounds, snake }),
     bounds,
     snake,
   };
+}
+
+export function addApple({ bounds, apples, snake }: SnakeState): Apples {
+  const apple = getApple({ apples, bounds, snake });
+
+  if (!apple) {
+    throw Error('Not enough room to create an apple');
+  }
+
+  return [...apples, apple];
 }
 
 export function moveSnake(snake: Snake, direction: Direction): Snake {

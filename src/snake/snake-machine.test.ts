@@ -37,6 +37,7 @@ describe(createSnakeMachine.name, () => {
     snakeMachine = createSnakeMachine<Apples, Bounds, Snake>({
       context,
       getNewContext: () => context,
+      updateApples: ({ apples }) => apples,
       willEatApple,
       willExceedBounds,
       willHitItself,

@@ -109,6 +109,7 @@ export type WillEatApple<TApples, TSnake> = ({
 
 export function createSnakeMachine<TApples, TBounds, TSnake>({
   context,
+  updateApples,
   getNewContext,
   willExceedBounds,
   willEatApple,
@@ -118,6 +119,7 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
   onUpdate,
 }: {
   context: SnakeContext<TApples, TBounds, TSnake>;
+  updateApples: (context: SnakeContext<TApples, TBounds, TSnake>) => TApples;
   getNewContext: () => SnakeContext<TApples, TBounds, TSnake>;
   willExceedBounds: WillExceedBounds<TBounds, TSnake>;
   willEatApple: WillEatApple<TApples, TSnake>;
@@ -173,7 +175,7 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
                   {
                     cond: 'appleUp',
                     target: '.unlocked',
-                    actions: ['growUp', 'notifyUpdate'],
+                    actions: ['growUp', 'updateApples', 'notifyUpdate'],
                   },
                   { target: '.unlocked', actions: ['moveUp', 'notifyUpdate'] },
                 ],
@@ -197,7 +199,7 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
                   {
                     cond: 'appleRight',
                     target: '.unlocked',
-                    actions: ['growRight', 'notifyUpdate'],
+                    actions: ['growRight', 'updateApples', 'notifyUpdate'],
                   },
                   {
                     target: '.unlocked',
@@ -224,7 +226,7 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
                   {
                     cond: 'appleDown',
                     target: '.unlocked',
-                    actions: ['growDown', 'notifyUpdate'],
+                    actions: ['growDown', 'updateApples', 'notifyUpdate'],
                   },
                   {
                     target: '.unlocked',
@@ -251,7 +253,7 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
                   {
                     cond: 'appleLeft',
                     target: '.unlocked',
-                    actions: ['growLeft', 'notifyUpdate'],
+                    actions: ['growLeft', 'updateApples', 'notifyUpdate'],
                   },
                   {
                     target: '.unlocked',
@@ -325,6 +327,11 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
             grow({ apples, snake, direction: Direction.left }).apples,
           snake: ({ apples, snake }) =>
             grow({ apples, snake, direction: Direction.left }).snake,
+        }),
+
+        updateApples: assign({
+          apples: ({ apples, bounds, snake }) =>
+            updateApples({ apples, bounds, snake }),
         }),
 
         notifyUpdate: ({ apples, snake }, event, meta) => {
