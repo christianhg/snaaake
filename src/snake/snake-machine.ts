@@ -43,7 +43,7 @@ interface SnakeStateSchema extends StateSchema {
   };
 }
 
-type SnakeContext<TApples, TBounds, TSnake> = {
+export type SnakeContext<TApples, TBounds, TSnake> = {
   bounds: TBounds;
   apples: TApples;
   snake: TSnake;
@@ -109,6 +109,7 @@ export type WillEatApple<TApples, TSnake> = ({
 
 export function createSnakeMachine<TApples, TBounds, TSnake>({
   context,
+  getNewContext,
   willExceedBounds,
   willEatApple,
   willHitItself,
@@ -117,6 +118,7 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
   onUpdate,
 }: {
   context: SnakeContext<TApples, TBounds, TSnake>;
+  getNewContext: () => SnakeContext<TApples, TBounds, TSnake>;
   willExceedBounds: WillExceedBounds<TBounds, TSnake>;
   willEatApple: WillEatApple<TApples, TSnake>;
   willHitItself: WillHitItself<TSnake>;
@@ -339,8 +341,8 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
         },
 
         reset: assign({
-          apples: ({ apples }) => context.apples,
-          snake: ({ snake }) => context.snake,
+          apples: ({ apples }) => getNewContext().apples,
+          snake: ({ snake }) => getNewContext().snake,
         }),
       },
       guards: {

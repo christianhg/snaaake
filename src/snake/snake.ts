@@ -1,10 +1,16 @@
 import { Direction } from './snake-machine';
+import { getRandomItem } from '../util/array';
 
 type Tuple<A, B> = [A, B];
 export type Coords = Tuple<number, number>;
 export type Apples = ReadonlyArray<Coords>;
 export type Bounds = ReadonlyArray<Coords>;
 export type Snake = ReadonlyArray<Coords>;
+export type SnakeState = {
+  apples: Apples;
+  bounds: Bounds;
+  snake: Snake;
+};
 
 function createCoords(a: number, b: number): Coords {
   return [a, b];
@@ -26,6 +32,40 @@ export function createBounds({
   }
 
   return bounds as Bounds;
+}
+
+function getFreeSquares({
+  bounds,
+  snake,
+}: {
+  bounds: Bounds;
+  snake: Snake;
+}): Coords[] {
+  return bounds.filter(
+    bound => !snake.some(part => part[0] === bound[0] && part[1] === bound[1])
+  );
+}
+
+export function getInitialSnakeState({
+  width,
+  height,
+}: {
+  width: number;
+  height: number;
+}): {
+  apples: Apples;
+  bounds: Bounds;
+  snake: Snake;
+} {
+  const bounds = createBounds({ width, height });
+  const snake = [getRandomItem(bounds)];
+  const apples = [getRandomItem(getFreeSquares({ bounds, snake }))];
+
+  return {
+    apples,
+    bounds,
+    snake,
+  };
 }
 
 export function moveSnake(snake: Snake, direction: Direction): Snake {

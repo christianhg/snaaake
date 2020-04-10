@@ -1,4 +1,8 @@
-import { createSnakeMachine, SnakeMachine } from './snake-machine';
+import {
+  createSnakeMachine,
+  SnakeMachine,
+  SnakeContext,
+} from './snake-machine';
 import {
   Apples,
   Bounds,
@@ -20,16 +24,19 @@ describe(createSnakeMachine.name, () => {
   beforeEach(() => {
     onUpdate = jest.fn();
 
+    const context: SnakeContext<Apples, Bounds, Snake> = {
+      apples: [
+        [5, 3],
+        [2, 3],
+        [3, 4],
+      ],
+      bounds,
+      snake: [[3, 3]],
+    };
+
     snakeMachine = createSnakeMachine<Apples, Bounds, Snake>({
-      context: {
-        apples: [
-          [5, 3],
-          [2, 3],
-          [3, 4],
-        ],
-        bounds,
-        snake: [[3, 3]],
-      },
+      context,
+      getNewContext: () => context,
       willEatApple,
       willExceedBounds,
       willHitItself,

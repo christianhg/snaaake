@@ -10,12 +10,12 @@ import {
   Apples,
   Bounds,
   Snake,
-  createBounds,
   willExceedBounds,
   willEatApple,
   willHitItself,
   moveSnake,
   growSnake,
+  getInitialSnakeState,
 } from './snake/snake';
 import { drawScene } from './snake/draw-snake';
 import { bindKeys } from './engine/keyboard';
@@ -37,23 +37,16 @@ export class Snaaake extends Component<
   constructor(props: CanvasSettings) {
     super(props);
 
-    const { width, height } = props;
+    const game = getInitialSnakeState(props);
 
     this.state = {
-      game: {
-        apples: [[10, 10]],
-        bounds: createBounds({ width, height }),
-        snake: [
-          [0, 0],
-          [0, 1],
-          [1, 1],
-        ],
-      },
+      game,
       status: 'idle',
     };
 
     this.snakeMachine = createSnakeMachine<Apples, Bounds, Snake>({
-      context: this.state.game,
+      context: game,
+      getNewContext: () => getInitialSnakeState(props),
       willExceedBounds,
       willEatApple,
       willHitItself,
