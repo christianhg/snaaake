@@ -46,8 +46,8 @@ export class Snaaake extends Component<
     };
 
     this.snakeMachine = createSnakeMachine<Apples, Bounds, Snake>({
-      context: game,
-      getNewContext: () => getInitialSnakeState(props),
+      initialData: game,
+      resetData: () => getInitialSnakeState(props),
       updateApples: addApple,
       willExceedBounds,
       willEatApple,

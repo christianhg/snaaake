@@ -24,7 +24,7 @@ describe(createSnakeMachine.name, () => {
   beforeEach(() => {
     onUpdate = jest.fn();
 
-    const context: SnakeContext<Apples, Bounds, Snake> = {
+    const initialData: SnakeContext<Apples, Bounds, Snake> = {
       apples: [
         [5, 3],
         [2, 3],
@@ -35,8 +35,8 @@ describe(createSnakeMachine.name, () => {
     };
 
     snakeMachine = createSnakeMachine<Apples, Bounds, Snake>({
-      context,
-      getNewContext: () => context,
+      initialData,
+      resetData: () => initialData,
       updateApples: ({ apples }) => apples,
       willEatApple,
       willExceedBounds,

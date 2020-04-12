@@ -108,9 +108,9 @@ export type WillEatApple<TApples, TSnake> = ({
 }) => boolean;
 
 export function createSnakeMachine<TApples, TBounds, TSnake>({
-  context,
+  initialData,
+  resetData,
   updateApples,
-  getNewContext,
   willExceedBounds,
   willEatApple,
   willHitItself,
@@ -118,9 +118,9 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
   grow,
   onUpdate,
 }: {
-  context: SnakeContext<TApples, TBounds, TSnake>;
+  initialData: SnakeContext<TApples, TBounds, TSnake>;
+  resetData: () => SnakeContext<TApples, TBounds, TSnake>;
   updateApples: (context: SnakeContext<TApples, TBounds, TSnake>) => TApples;
-  getNewContext: () => SnakeContext<TApples, TBounds, TSnake>;
   willExceedBounds: WillExceedBounds<TBounds, TSnake>;
   willEatApple: WillEatApple<TApples, TSnake>;
   willHitItself: WillHitItself<TSnake>;
@@ -149,7 +149,7 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
   >(
     {
       id: 'snake',
-      context,
+      context: initialData,
       initial: 'idle',
       states: {
         idle: {
@@ -348,8 +348,8 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
         },
 
         reset: assign({
-          apples: ({ apples }) => getNewContext().apples,
-          snake: ({ snake }) => getNewContext().snake,
+          apples: ({ apples }) => resetData().apples,
+          snake: ({ snake }) => resetData().snake,
         }),
       },
       guards: {
