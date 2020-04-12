@@ -15,26 +15,18 @@ import {
   createBounds,
 } from './snake';
 
-const bounds: Bounds = createBounds({ width: 6, height: 6 });
-
 describe(createSnakeMachine.name, () => {
-  let onUpdate: jest.Mock;
-  let snakeMachine: SnakeMachine<Apples, Bounds, Snake>;
-
-  beforeEach(() => {
-    onUpdate = jest.fn();
-
+  function setUpTest(
+    { apples, snake }: Omit<SnakeContext<Apples, Bounds, Snake>, 'bounds'>,
+    onUpdate: jest.Mock
+  ): SnakeMachine<Apples, Bounds, Snake> {
     const initialData: SnakeContext<Apples, Bounds, Snake> = {
-      apples: [
-        [5, 3],
-        [2, 3],
-        [3, 4],
-      ],
-      bounds,
-      snake: [[3, 3]],
+      apples,
+      bounds: createBounds({ width: 6, height: 6 }),
+      snake,
     };
 
-    snakeMachine = createSnakeMachine<Apples, Bounds, Snake>({
+    return createSnakeMachine<Apples, Bounds, Snake>({
       initialData,
       resetData: () => initialData,
       updateApples: ({ apples }) => apples,
@@ -45,15 +37,41 @@ describe(createSnakeMachine.name, () => {
       grow: growSnake,
       onUpdate,
     });
-  });
+  }
 
   it('does not update on ticks when no direction is set', () => {
+    const onUpdate = jest.fn();
+    const snakeMachine = setUpTest(
+      {
+        apples: [
+          [5, 3],
+          [2, 3],
+          [3, 4],
+        ],
+        snake: [[3, 3]],
+      },
+      onUpdate
+    );
+
     snakeMachine.send('TICK');
 
     expect(onUpdate).not.toBeCalled();
   });
 
   it('can run straight up into a wall', () => {
+    const onUpdate = jest.fn();
+    const snakeMachine = setUpTest(
+      {
+        apples: [
+          [5, 3],
+          [2, 3],
+          [3, 4],
+        ],
+        snake: [[3, 3]],
+      },
+      onUpdate
+    );
+
     snakeMachine.send('UP');
     snakeMachine.send('TICK');
     snakeMachine.send('TICK');
@@ -99,6 +117,19 @@ describe(createSnakeMachine.name, () => {
   });
 
   it('can grow', () => {
+    const onUpdate = jest.fn();
+    const snakeMachine = setUpTest(
+      {
+        apples: [
+          [5, 3],
+          [2, 3],
+          [3, 4],
+        ],
+        snake: [[3, 3]],
+      },
+      onUpdate
+    );
+
     snakeMachine.send('RIGHT');
     snakeMachine.send('TICK');
     snakeMachine.send('TICK');
@@ -126,6 +157,19 @@ describe(createSnakeMachine.name, () => {
   });
 
   it('can go in circles', () => {
+    const onUpdate = jest.fn();
+    const snakeMachine = setUpTest(
+      {
+        apples: [
+          [5, 3],
+          [2, 3],
+          [3, 4],
+        ],
+        snake: [[3, 3]],
+      },
+      onUpdate
+    );
+
     snakeMachine.send('LEFT');
     snakeMachine.send('TICK');
 
