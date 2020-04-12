@@ -107,6 +107,18 @@ export type WillEatApple<TApples, TSnake> = ({
   direction: Direction;
 }) => boolean;
 
+export type GrowSnake<TApples, TSnake> = ({
+  apples,
+  snake,
+  direction,
+}: {
+  apples: TApples;
+  snake: TSnake;
+  direction: Direction;
+}) => { apples: TApples; snake: TSnake };
+
+export type MoveSnake<TSnake> = (snake: TSnake, direction: Direction) => TSnake;
+
 export function createSnakeMachine<TApples, TBounds, TSnake>({
   initialData,
   resetData,
@@ -124,16 +136,8 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
   willExceedBounds: WillExceedBounds<TBounds, TSnake>;
   willEatApple: WillEatApple<TApples, TSnake>;
   willHitItself: WillHitItself<TSnake>;
-  move: (snake: TSnake, direction: Direction) => TSnake;
-  grow: ({
-    apples,
-    snake,
-    direction,
-  }: {
-    apples: TApples;
-    snake: TSnake;
-    direction: Direction;
-  }) => { apples: TApples; snake: TSnake };
+  move: MoveSnake<TSnake>;
+  grow: GrowSnake<TApples, TSnake>;
   onUpdate: ({
     apples,
     snake,
