@@ -61,47 +61,39 @@ describe(createSnakeMachine.name, () => {
     snakeMachine.send('TICK');
 
     expect(onUpdate).toHaveBeenNthCalledWith(1, {
-      context: {
-        apples: [
-          [5, 3],
-          [2, 3],
-          [3, 4],
-        ],
-        snake: [[3, 2]],
-      },
+      apples: [
+        [5, 3],
+        [2, 3],
+        [3, 4],
+      ],
+      snake: [[3, 2]],
       state: 'moving',
     });
     expect(onUpdate).toHaveBeenNthCalledWith(2, {
-      context: {
-        apples: [
-          [5, 3],
-          [2, 3],
-          [3, 4],
-        ],
-        snake: [[3, 1]],
-      },
+      apples: [
+        [5, 3],
+        [2, 3],
+        [3, 4],
+      ],
+      snake: [[3, 1]],
       state: 'moving',
     });
     expect(onUpdate).toHaveBeenNthCalledWith(3, {
-      context: {
-        apples: [
-          [5, 3],
-          [2, 3],
-          [3, 4],
-        ],
-        snake: [[3, 0]],
-      },
+      apples: [
+        [5, 3],
+        [2, 3],
+        [3, 4],
+      ],
+      snake: [[3, 0]],
       state: 'moving',
     });
     expect(onUpdate).toHaveBeenNthCalledWith(4, {
-      context: {
-        apples: [
-          [5, 3],
-          [2, 3],
-          [3, 4],
-        ],
-        snake: [[3, 0]],
-      },
+      apples: [
+        [5, 3],
+        [2, 3],
+        [3, 4],
+      ],
+      snake: [[3, 0]],
       state: 'dead',
     });
   });
@@ -112,27 +104,23 @@ describe(createSnakeMachine.name, () => {
     snakeMachine.send('TICK');
 
     expect(onUpdate).toHaveBeenNthCalledWith(1, {
-      context: {
-        apples: [
-          [5, 3],
-          [2, 3],
-          [3, 4],
-        ],
-        snake: [[4, 3]],
-      },
+      apples: [
+        [5, 3],
+        [2, 3],
+        [3, 4],
+      ],
+      snake: [[4, 3]],
       state: 'moving',
     });
     expect(onUpdate).toHaveBeenNthCalledWith(2, {
-      context: {
-        apples: [
-          [2, 3],
-          [3, 4],
-        ],
-        snake: [
-          [5, 3],
-          [4, 3],
-        ],
-      },
+      apples: [
+        [2, 3],
+        [3, 4],
+      ],
+      snake: [
+        [5, 3],
+        [4, 3],
+      ],
       state: 'moving',
     });
   });
@@ -142,16 +130,14 @@ describe(createSnakeMachine.name, () => {
     snakeMachine.send('TICK');
 
     expect(onUpdate).toHaveBeenNthCalledWith(1, {
-      context: {
-        apples: [
-          [5, 3],
-          [3, 4],
-        ],
-        snake: [
-          [2, 3],
-          [3, 3],
-        ],
-      },
+      apples: [
+        [5, 3],
+        [3, 4],
+      ],
+      snake: [
+        [2, 3],
+        [3, 3],
+      ],
       state: 'moving',
     });
 
@@ -159,16 +145,14 @@ describe(createSnakeMachine.name, () => {
     snakeMachine.send('TICK');
 
     expect(onUpdate).toHaveBeenNthCalledWith(2, {
-      context: {
-        apples: [
-          [5, 3],
-          [3, 4],
-        ],
-        snake: [
-          [2, 4],
-          [2, 3],
-        ],
-      },
+      apples: [
+        [5, 3],
+        [3, 4],
+      ],
+      snake: [
+        [2, 4],
+        [2, 3],
+      ],
       state: 'moving',
     });
 
@@ -176,14 +160,12 @@ describe(createSnakeMachine.name, () => {
     snakeMachine.send('TICK');
 
     expect(onUpdate).toHaveBeenNthCalledWith(3, {
-      context: {
-        apples: [[5, 3]],
-        snake: [
-          [3, 4],
-          [2, 4],
-          [2, 3],
-        ],
-      },
+      apples: [[5, 3]],
+      snake: [
+        [3, 4],
+        [2, 4],
+        [2, 3],
+      ],
       state: 'moving',
     });
   });

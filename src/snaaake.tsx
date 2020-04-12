@@ -54,12 +54,12 @@ export class Snaaake extends Component<
       willHitItself,
       move: moveSnake,
       grow: growSnake,
-      onUpdate: ({ context, state }) => {
+      onUpdate: ({ apples, snake, state }) => {
         this.setState({
           game: {
             ...this.state.game,
-            apples: context.apples,
-            snake: context.snake,
+            apples,
+            snake,
           },
           status: state,
         });

@@ -135,10 +135,12 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
     direction: Direction;
   }) => { apples: TApples; snake: TSnake };
   onUpdate: ({
-    context,
+    apples,
+    snake,
     state,
   }: {
-    context: Omit<SnakeContext<TApples, TBounds, TSnake>, 'bounds'>;
+    apples: TApples;
+    snake: TSnake;
     state: SnakeMachineState<TApples, TBounds, TSnake>;
   }) => void;
 }): SnakeMachine<TApples, TBounds, TSnake> {
@@ -336,7 +338,8 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
 
         notifyUpdate: ({ apples, snake }, event, meta) => {
           onUpdate({
-            context: { apples, snake },
+            apples,
+            snake,
             state: (typeof meta.state.value === 'string'
               ? meta.state.value
               : Object.keys(meta.state.value)[0]) as SnakeMachineState<
