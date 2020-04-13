@@ -58,6 +58,56 @@ describe(createSnakeMachine.name, () => {
     expect(onUpdate).not.toBeCalled();
   });
 
+  it('can quickly reverse its direction', () => {
+    const onUpdate = jest.fn();
+    const snakeMachine = setUpTest(
+      {
+        apples: [],
+        snake: [[3, 3]],
+      },
+      onUpdate
+    );
+
+    snakeMachine.send('UP');
+    snakeMachine.send('TICK');
+
+    expect(onUpdate).toHaveBeenNthCalledWith(1, {
+      apples: [],
+      snake: [[3, 2]],
+      state: 'moving',
+    });
+
+    snakeMachine.send('RIGHT');
+    snakeMachine.send('DOWN');
+    snakeMachine.send('TICK');
+
+    expect(onUpdate).toHaveBeenNthCalledWith(2, {
+      apples: [],
+      snake: [[4, 3]],
+      state: 'moving',
+    });
+
+    snakeMachine.send('LEFT');
+    snakeMachine.send('UP');
+    snakeMachine.send('TICK');
+
+    expect(onUpdate).toHaveBeenNthCalledWith(3, {
+      apples: [],
+      snake: [[3, 2]],
+      state: 'moving',
+    });
+
+    snakeMachine.send('LEFT');
+    snakeMachine.send('DOWN');
+    snakeMachine.send('TICK');
+
+    expect(onUpdate).toHaveBeenNthCalledWith(4, {
+      apples: [],
+      snake: [[2, 3]],
+      state: 'moving',
+    });
+  });
+
   it('can run straight up into a wall', () => {
     const onUpdate = jest.fn();
     const snakeMachine = setUpTest(
