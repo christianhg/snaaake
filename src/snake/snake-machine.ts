@@ -21,6 +21,8 @@ interface SnakeStateSchema extends StateSchema {
         right: {
           states: {
             locked: {};
+            queueUp: {};
+            queueDown: {};
             unlocked: {};
           };
         };
@@ -204,8 +206,30 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
                   { target: '#snake.dead', cond: 'snakeRight' },
                   {
                     cond: 'appleRight',
+                    in: '#snake.moving.right.queueUp',
+                    target: '#snake.moving.up',
+                    actions: ['growRight', 'updateApples', 'notifyUpdate'],
+                  },
+                  {
+                    cond: 'appleRight',
+                    in: '#snake.moving.right.queueDown',
+                    target: '#snake.moving.down',
+                    actions: ['growRight', 'updateApples', 'notifyUpdate'],
+                  },
+                  {
+                    cond: 'appleRight',
                     target: '.unlocked',
                     actions: ['growRight', 'updateApples', 'notifyUpdate'],
+                  },
+                  {
+                    in: '#snake.moving.right.queueUp',
+                    target: '#snake.moving.up',
+                    actions: ['moveRight', 'notifyUpdate'],
+                  },
+                  {
+                    in: '#snake.moving.right.queueDown',
+                    target: '#snake.moving.down',
+                    actions: ['moveRight', 'notifyUpdate'],
                   },
                   {
                     target: '.unlocked',
@@ -215,7 +239,14 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
               },
               initial: 'locked',
               states: {
-                locked: {},
+                locked: {
+                  on: {
+                    UP: { target: 'queueUp' },
+                    DOWN: { target: 'queueDown' },
+                  },
+                },
+                queueUp: {},
+                queueDown: {},
                 unlocked: {
                   on: {
                     UP: { target: '#snake.moving.up' },
