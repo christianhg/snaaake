@@ -21,8 +21,6 @@ interface SnakeStateSchema extends StateSchema {
         right: {
           states: {
             locked: {};
-            queueUp: {};
-            queueDown: {};
             unlocked: {};
           };
         };
@@ -49,6 +47,7 @@ export type SnakeContext<TApples, TBounds, TSnake> = {
   bounds: TBounds;
   apples: TApples;
   snake: TSnake;
+  nextDirection?: Direction;
 };
 
 type SnakeEvent =
@@ -170,12 +169,15 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
         },
         moving: {
           on: {
-            SPACE: {
-              target: '#snake.paused',
-            },
+            SPACE: { target: '#snake.paused' },
+            UP: { actions: ['queueUp'] },
+            RIGHT: { actions: ['queueRight'] },
+            DOWN: { actions: ['queueDown'] },
+            LEFT: { actions: ['queueLeft'] },
           },
           states: {
             up: {
+              entry: ['resetQueue'],
               on: {
                 TICK: [
                   { target: '#snake.dead', cond: 'boundUp' },
@@ -193,43 +195,24 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
                 locked: {},
                 unlocked: {
                   on: {
-                    RIGHT: { target: '#snake.moving.right' },
-                    LEFT: { target: '#snake.moving.left' },
+                    '': [
+                      { cond: 'rightQueued', target: '#snake.moving.right' },
+                      { cond: 'leftQueued', target: '#snake.moving.left' },
+                    ],
                   },
                 },
               },
             },
             right: {
+              entry: ['resetQueue'],
               on: {
                 TICK: [
                   { target: '#snake.dead', cond: 'boundRight' },
                   { target: '#snake.dead', cond: 'snakeRight' },
                   {
                     cond: 'appleRight',
-                    in: '#snake.moving.right.queueUp',
-                    target: '#snake.moving.up',
-                    actions: ['growRight', 'updateApples', 'notifyUpdate'],
-                  },
-                  {
-                    cond: 'appleRight',
-                    in: '#snake.moving.right.queueDown',
-                    target: '#snake.moving.down',
-                    actions: ['growRight', 'updateApples', 'notifyUpdate'],
-                  },
-                  {
-                    cond: 'appleRight',
                     target: '.unlocked',
                     actions: ['growRight', 'updateApples', 'notifyUpdate'],
-                  },
-                  {
-                    in: '#snake.moving.right.queueUp',
-                    target: '#snake.moving.up',
-                    actions: ['moveRight', 'notifyUpdate'],
-                  },
-                  {
-                    in: '#snake.moving.right.queueDown',
-                    target: '#snake.moving.down',
-                    actions: ['moveRight', 'notifyUpdate'],
                   },
                   {
                     target: '.unlocked',
@@ -239,23 +222,19 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
               },
               initial: 'locked',
               states: {
-                locked: {
-                  on: {
-                    UP: { target: 'queueUp' },
-                    DOWN: { target: 'queueDown' },
-                  },
-                },
-                queueUp: {},
-                queueDown: {},
+                locked: {},
                 unlocked: {
                   on: {
-                    UP: { target: '#snake.moving.up' },
-                    DOWN: { target: '#snake.moving.down' },
+                    '': [
+                      { cond: 'upQueued', target: '#snake.moving.up' },
+                      { cond: 'downQueued', target: '#snake.moving.down' },
+                    ],
                   },
                 },
               },
             },
             down: {
+              entry: ['resetQueue'],
               on: {
                 TICK: [
                   { target: '#snake.dead', cond: 'boundDown' },
@@ -276,13 +255,16 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
                 locked: {},
                 unlocked: {
                   on: {
-                    RIGHT: { target: '#snake.moving.right' },
-                    LEFT: { target: '#snake.moving.left' },
+                    '': [
+                      { cond: 'rightQueued', target: '#snake.moving.right' },
+                      { cond: 'leftQueued', target: '#snake.moving.left' },
+                    ],
                   },
                 },
               },
             },
             left: {
+              entry: ['resetQueue'],
               on: {
                 TICK: [
                   { target: '#snake.dead', cond: 'boundLeft' },
@@ -303,8 +285,10 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
                 locked: {},
                 unlocked: {
                   on: {
-                    UP: { target: '#snake.moving.up' },
-                    DOWN: { target: '#snake.moving.down' },
+                    '': [
+                      { cond: 'upQueued', target: '#snake.moving.up' },
+                      { cond: 'downQueued', target: '#snake.moving.down' },
+                    ],
                   },
                 },
               },
@@ -328,6 +312,22 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
     },
     {
       actions: {
+        queueUp: assign({
+          nextDirection: ({ nextDirection }) => Direction.up,
+        }),
+        queueRight: assign({
+          nextDirection: ({ nextDirection }) => Direction.right,
+        }),
+        queueDown: assign({
+          nextDirection: ({ nextDirection }) => Direction.down,
+        }),
+        queueLeft: assign({
+          nextDirection: ({ nextDirection }) => Direction.left,
+        }),
+        resetQueue: assign({
+          nextDirection: ({ nextDirection }) => undefined,
+        }),
+
         moveUp: assign({
           snake: ({ snake }) => move(snake, Direction.up),
         }),
@@ -391,6 +391,11 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
         }),
       },
       guards: {
+        upQueued: ({ nextDirection }) => nextDirection === Direction.up,
+        rightQueued: ({ nextDirection }) => nextDirection === Direction.right,
+        downQueued: ({ nextDirection }) => nextDirection === Direction.down,
+        leftQueued: ({ nextDirection }) => nextDirection === Direction.left,
+
         appleUp: ({ apples, snake }) =>
           willEatApple({ apples, snake, direction: Direction.up }),
         appleRight: ({ apples, snake }) =>

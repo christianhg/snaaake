@@ -95,41 +95,60 @@ describe(createSnakeMachine.name, () => {
       state: 'moving',
     });
 
-    // snakeMachine.send('LEFT');
-    // snakeMachine.send('UP');
-    // snakeMachine.send('TICK');
+    snakeMachine.send('RIGHT');
+    snakeMachine.send('UP');
 
-    // expect(onUpdate).toHaveBeenNthCalledWith(4, {
-    //   apples: [],
-    //   snake: [[3, 3]],
-    //   state: 'moving',
-    // });
+    snakeMachine.send('TICK');
 
-    // snakeMachine.send('TICK');
+    expect(onUpdate).toHaveBeenNthCalledWith(4, {
+      apples: [],
+      snake: [[5, 3]],
+      state: 'moving',
+    });
 
-    // expect(onUpdate).toHaveBeenNthCalledWith(5, {
-    //   apples: [],
-    //   snake: [[3, 2]],
-    //   state: 'moving',
-    // });
+    snakeMachine.send('TICK');
 
-    // snakeMachine.send('LEFT');
-    // snakeMachine.send('DOWN');
-    // snakeMachine.send('TICK');
+    expect(onUpdate).toHaveBeenNthCalledWith(5, {
+      apples: [],
+      snake: [[5, 2]],
+      state: 'moving',
+    });
 
-    // expect(onUpdate).toHaveBeenNthCalledWith(6, {
-    //   apples: [],
-    //   snake: [[2, 2]],
-    //   state: 'moving',
-    // });
+    snakeMachine.send('LEFT');
+    snakeMachine.send('UP');
+    snakeMachine.send('TICK');
 
-    // snakeMachine.send('TICK');
+    expect(onUpdate).toHaveBeenNthCalledWith(6, {
+      apples: [],
+      snake: [[4, 2]],
+      state: 'moving',
+    });
 
-    // expect(onUpdate).toHaveBeenNthCalledWith(7, {
-    //   apples: [],
-    //   snake: [[2, 3]],
-    //   state: 'moving',
-    // });
+    snakeMachine.send('TICK');
+
+    expect(onUpdate).toHaveBeenNthCalledWith(7, {
+      apples: [],
+      snake: [[4, 1]],
+      state: 'moving',
+    });
+
+    snakeMachine.send('LEFT');
+    snakeMachine.send('DOWN');
+    snakeMachine.send('TICK');
+
+    expect(onUpdate).toHaveBeenNthCalledWith(8, {
+      apples: [],
+      snake: [[3, 1]],
+      state: 'moving',
+    });
+
+    snakeMachine.send('TICK');
+
+    expect(onUpdate).toHaveBeenNthCalledWith(9, {
+      apples: [],
+      snake: [[3, 2]],
+      state: 'moving',
+    });
   });
 
   it('can run straight up into a wall', () => {
