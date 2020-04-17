@@ -1,16 +1,24 @@
 import { Snake, Apples, Bounds } from './snake';
 
+// const black = '#1E2127';
+// const darkGrey = '#282C34';
+const grey = '#5C6370';
+// const lightGrey = '#ABB2BF';
+const green = '#98C379';
+const red = '#E06C75';
+// const yellow = '#D19A66';
+// const blue = '#61AFEF';
+// const magenta = '#C678DD';
+// const cyan = '#56B6C2';
+
 function drawSnake(
   snake: Snake,
   scale: number,
   context: CanvasRenderingContext2D
 ): void {
-  snake.forEach(part => {
-    context.strokeStyle = '#ffffff';
-    context.beginPath();
-    context.lineWidth = 2;
-    context.rect(part[0] * scale, part[1] * scale, scale, scale);
-    context.stroke();
+  snake.forEach(([x, y]) => {
+    context.fillStyle = green;
+    context.fillRect(x * scale + 3, y * scale + 3, scale - 6, scale - 6);
   });
 }
 
@@ -19,22 +27,10 @@ function drawApples(
   scale: number,
   context: CanvasRenderingContext2D
 ): void {
-  const firstApple = apples[0];
-
-  if (firstApple) {
-    context.strokeStyle = '#ffffff';
-    context.beginPath();
-    context.lineWidth = 2;
-    context.arc(
-      firstApple[0] * scale + scale / 2,
-      firstApple[1] * scale + scale / 2,
-      scale / 2,
-      0,
-      Math.PI * 2
-    );
-    context.closePath();
-    context.stroke();
-  }
+  apples.forEach(([x, y]) => {
+    context.fillStyle = red;
+    context.fillRect(x * scale + 3, y * scale + 3, scale - 6, scale - 6);
+  });
 }
 
 export function drawScene(
@@ -48,7 +44,13 @@ export function drawScene(
     bounds[bounds.length - 1][0] * scale + scale,
     bounds[bounds.length - 1][1] * scale + scale
   );
-  context.fillStyle = '#000000';
+  bounds.forEach(([x, y]) => {
+    context.strokeStyle = grey;
+    context.beginPath();
+    context.lineWidth = 1;
+    context.rect(x * scale + 2, y * scale + 2, scale - 4, scale - 4);
+    context.stroke();
+  });
 
   drawSnake(snake, scale, context);
   drawApples(apples, scale, context);

@@ -133,9 +133,8 @@ export class Snaaake extends Component<
   render() {
     return (
       <div>
-        <p>
-          Current status: <b>{this.state.status}</b>
-        </p>
+        <h1>🅂🄽🄰🄰🄰🄺🄴</h1>
+        <p className="status">{this.state.status}</p>
         <Canvas
           settings={this.props}
           state={this.state.game}

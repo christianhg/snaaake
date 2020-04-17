@@ -1,5 +1,26 @@
+body {
+  background-color: #1e2127;
+  color: #abb2bf;
+  padding: 1em;
+  text-align: center;
+}
+
+h1 {
+  color: #c678dd;
+}
+
+.status {
+  border: 1px solid #56b6c2;
+  color: #56b6c2;
+  display: inline-block;
+  padding: 10px;
+  border-radius: 5px;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
 canvas {
-  background: #000000;
+  background: #282c34;
   display: block;
   image-rendering: pixelated;
   margin: 0 auto;

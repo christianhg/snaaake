@@ -26,8 +26,8 @@ export function createBounds({
 }): Bounds {
   let bounds: Coords[] = [];
 
-  for (let x = 0; x <= width; x++) {
-    for (let y = 0; y <= height; y++) {
+  for (let x = 0; x <= width - 1; x++) {
+    for (let y = 0; y <= height - 1; y++) {
       bounds.push([x, y]);
     }
   }

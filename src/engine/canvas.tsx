@@ -28,10 +28,6 @@ export function Canvas<State>({
   });
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={width * scale + scale}
-      height={height * scale + scale}
-    />
+    <canvas ref={canvasRef} width={width * scale} height={height * scale} />
   );
 }
