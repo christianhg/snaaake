@@ -9,6 +9,7 @@ h1 {
   color: #c678dd;
 }
 
+.instructions li,
 .status,
 .score {
   display: inline-block;
@@ -26,6 +27,19 @@ h1 {
 .score {
   border: 1px solid #d19a66;
   color: #d19a66;
+}
+
+.instructions li {
+  color: #abb2bf;
+}
+
+kbd {
+  border-radius: 5px;
+  padding: 0.5em;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  background-color: #282c34;
+  border: 1px solid #abb2bf;
 }
 
 canvas {

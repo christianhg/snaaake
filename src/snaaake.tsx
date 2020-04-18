@@ -134,13 +134,33 @@ export class Snaaake extends Component<
     return (
       <div>
         <h1>🅂🄽🄰🄰🄰🄺🄴</h1>
-        <p className="status">{this.state.status}</p>
+        <p className="score">{this.state.game.snake.length - 1}</p>
         <Canvas
           settings={this.props}
           state={this.state.game}
           draw={drawScene}
         />
-        <p className="score">{this.state.game.snake.length - 1}</p>
+        <p className="status">{this.state.status}</p>
+        <ul className="instructions">
+          {this.state.status === 'idle' ? (
+            <li>
+              Hit <kbd>↑</kbd>, <kbd>→</kbd>, <kbd>↓</kbd> or <kbd>←</kbd> to
+              get moving
+            </li>
+          ) : this.state.status === 'moving' ? (
+            <li>
+              Hit <kbd>Space</kbd> to pause
+            </li>
+          ) : this.state.status === 'paused' ? (
+            <li>
+              Hit <kbd>Space</kbd> to resume or <kbd>Escape</kbd> to restart
+            </li>
+          ) : (
+            <li>
+              Hit <kbd>Space</kbd> to restart
+            </li>
+          )}
+        </ul>
       </div>
     );
   }
