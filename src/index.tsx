@@ -4,6 +4,6 @@ import { Snaaake } from './snaaake';
 import './main.css';
 
 ReactDOM.render(
-  <Snaaake width={20} height={20} scale={24} />,
+  <Snaaake width={18} height={18} scale={24} />,
   document.getElementById('root')
 );

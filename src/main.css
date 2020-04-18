@@ -6,45 +6,42 @@ body {
 }
 
 h1 {
-  color: #c678dd;
+  color: rgb(198, 120, 221);
+  margin-bottom: 0;
 }
 
-.instructions li,
-.status,
-.score {
+.score,
+kbd {
   display: inline-block;
-  padding: 10px;
-  border-radius: 5px;
   text-transform: uppercase;
   font-weight: bold;
-}
-
-.status {
-  border: 1px solid #56b6c2;
-  color: #56b6c2;
+  border-radius: 5px;
+  padding: 0.3em 0.5em;
 }
 
 .score {
-  border: 1px solid #d19a66;
-  color: #d19a66;
-}
-
-.instructions li {
-  color: #abb2bf;
+  background-color: rgba(209, 154, 102, 0.2);
+  border: 1px solid rgba(209, 154, 102, 0.4);
+  color: rgb(209, 154, 102);
 }
 
 kbd {
-  border-radius: 5px;
-  padding: 0.5em;
   margin-left: 0.5em;
   margin-right: 0.5em;
-  background-color: #282c34;
-  border: 1px solid #abb2bf;
+  background-color: rgba(86, 182, 194, 0.2);
+  color: rgb(86, 182, 194);
+  border: 1px solid rgba(86, 182, 194, 0.4);
+}
+
+kbd span {
+  font-size: 0.8em;
+  vertical-align: middle;
 }
 
 canvas {
   background: #282c34;
   display: block;
   image-rendering: pixelated;
-  margin: 0 auto;
+  padding: 0.5em;
+  margin: 0 auto 1.5em;
 }

@@ -140,27 +140,37 @@ export class Snaaake extends Component<
           state={this.state.game}
           draw={drawScene}
         />
-        <p className="status">{this.state.status}</p>
-        <ul className="instructions">
+        <p>
           {this.state.status === 'idle' ? (
-            <li>
-              Hit <kbd>↑</kbd>, <kbd>→</kbd>, <kbd>↓</kbd> or <kbd>←</kbd> to
-              get moving
-            </li>
+            <>
+              <kbd>↑</kbd>
+              <kbd>→</kbd>
+              <kbd>↓</kbd>
+              <kbd>←</kbd>
+            </>
           ) : this.state.status === 'moving' ? (
-            <li>
-              Hit <kbd>Space</kbd> to pause
-            </li>
+            <>
+              <kbd>
+                Space <span>(pause)</span>
+              </kbd>
+            </>
           ) : this.state.status === 'paused' ? (
-            <li>
-              Hit <kbd>Space</kbd> to resume or <kbd>Escape</kbd> to restart
-            </li>
+            <>
+              <kbd>
+                Space <span>(resume)</span>
+              </kbd>
+              <kbd>
+                Escape <span>(restart)</span>
+              </kbd>
+            </>
           ) : (
-            <li>
-              Hit <kbd>Space</kbd> to restart
-            </li>
+            <>
+              <kbd>
+                Space <span>(restart)</span>
+              </kbd>
+            </>
           )}
-        </ul>
+        </p>
       </div>
     );
   }
