@@ -140,6 +140,7 @@ export class Snaaake extends Component<
           state={this.state.game}
           draw={drawScene}
         />
+        <p className="score">{this.state.game.snake.length - 1}</p>
       </div>
     );
   }

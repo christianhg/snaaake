@@ -9,14 +9,23 @@ h1 {
   color: #c678dd;
 }
 
-.status {
-  border: 1px solid #56b6c2;
-  color: #56b6c2;
+.status,
+.score {
   display: inline-block;
   padding: 10px;
   border-radius: 5px;
   text-transform: uppercase;
   font-weight: bold;
+}
+
+.status {
+  border: 1px solid #56b6c2;
+  color: #56b6c2;
+}
+
+.score {
+  border: 1px solid #d19a66;
+  color: #d19a66;
 }
 
 canvas {
