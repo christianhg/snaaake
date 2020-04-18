@@ -12,6 +12,7 @@ interface SnakeStateSchema extends StateSchema {
     idle: {};
     moving: {
       states: {
+        hist: {};
         up: {
           states: {
             locked: {};
@@ -176,6 +177,9 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
             LEFT: { actions: ['queueLeft'] },
           },
           states: {
+            hist: {
+              type: 'history',
+            },
             up: {
               entry: ['resetQueue'],
               on: {
@@ -304,7 +308,7 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
         paused: {
           entry: ['notifyUpdate'],
           on: {
-            SPACE: { target: 'idle', actions: ['notifyUpdate'] },
+            SPACE: { target: 'moving.hist' },
             ESCAPE: { target: 'idle', actions: ['reset', 'notifyUpdate'] },
           },
         },
