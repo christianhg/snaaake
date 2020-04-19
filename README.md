@@ -4,7 +4,7 @@
 
 > A snake game driven by [XState](https://xstate.js.org/)
 
-Demo: [https://snaaake.netlify.app](snaaake.netlify.app)
+Demo: [snaaake.netlify.app](https://snaaake.netlify.app)
 
 ![Snaaake](snaaake.png)
 
