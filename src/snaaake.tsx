@@ -15,7 +15,7 @@ import {
   willHitItself,
   moveSnake,
   growSnake,
-  getInitialSnakeState,
+  getInitialSnakeData,
   addApple,
 } from './snake/snake';
 import { drawScene } from './snake/draw-snake';
@@ -38,7 +38,7 @@ export class Snaaake extends Component<
   constructor(props: CanvasSettings) {
     super(props);
 
-    const game = getInitialSnakeState(props);
+    const game = getInitialSnakeData(props);
 
     this.state = {
       game,
@@ -47,13 +47,13 @@ export class Snaaake extends Component<
 
     this.snakeMachine = createSnakeMachine<Apples, Bounds, Snake>({
       initialData: game,
-      resetData: () => getInitialSnakeState(props),
+      resetData: () => getInitialSnakeData(props),
       updateApples: addApple,
       willExceedBounds,
       willEatApple,
       willHitItself,
-      move: moveSnake,
-      grow: growSnake,
+      moveSnake,
+      growSnake,
       onUpdate: ({ apples, snake, state }) => {
         this.setState({
           game: {

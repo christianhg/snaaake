@@ -1,8 +1,4 @@
-import {
-  createSnakeMachine,
-  SnakeMachine,
-  SnakeContext,
-} from './snake-machine';
+import { createSnakeMachine, SnakeMachine, SnakeData } from './snake-machine';
 import {
   Apples,
   Bounds,
@@ -17,10 +13,10 @@ import {
 
 describe(createSnakeMachine.name, () => {
   function setUpTest(
-    { apples, snake }: Omit<SnakeContext<Apples, Bounds, Snake>, 'bounds'>,
+    { apples, snake }: Omit<SnakeData<Apples, Bounds, Snake>, 'bounds'>,
     onUpdate: jest.Mock
   ): SnakeMachine<Apples, Bounds, Snake> {
-    const initialData: SnakeContext<Apples, Bounds, Snake> = {
+    const initialData: SnakeData<Apples, Bounds, Snake> = {
       apples,
       bounds: createBounds({ width: 6, height: 6 }),
       snake,
@@ -33,8 +29,8 @@ describe(createSnakeMachine.name, () => {
       willEatApple,
       willExceedBounds,
       willHitItself,
-      move: moveSnake,
-      grow: growSnake,
+      moveSnake,
+      growSnake,
       onUpdate,
     });
   }

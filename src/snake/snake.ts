@@ -1,4 +1,4 @@
-import { Direction } from './snake-machine';
+import { Direction, SnakeData } from './snake-machine';
 import { getRandomItem } from '../util/array';
 
 type Tuple<A, B> = [A, B];
@@ -7,11 +7,6 @@ export type Apple = Coords;
 export type Apples = ReadonlyArray<Apple>;
 export type Bounds = ReadonlyArray<Coords>;
 export type Snake = ReadonlyArray<Coords>;
-export type SnakeState = {
-  apples: Apples;
-  bounds: Bounds;
-  snake: Snake;
-};
 
 function createCoords(a: number, b: number): Coords {
   return [a, b];
@@ -35,7 +30,11 @@ export function createBounds({
   return bounds as Bounds;
 }
 
-function getFreeSquares({ apples, bounds, snake }: SnakeState): Coords[] {
+function getFreeSquares({
+  apples,
+  bounds,
+  snake,
+}: SnakeData<Apples, Bounds, Snake>): Coords[] {
   return bounds
     .filter(
       bound => !snake.some(part => part[0] === bound[0] && part[1] === bound[1])
@@ -50,17 +49,17 @@ export function getApple({
   apples,
   bounds,
   snake,
-}: SnakeState): Apple | undefined {
+}: SnakeData<Apples, Bounds, Snake>): Apple | undefined {
   return getRandomItem(getFreeSquares({ apples, bounds, snake }));
 }
 
-export function getInitialSnakeState({
+export function getInitialSnakeData({
   width,
   height,
 }: {
   width: number;
   height: number;
-}): SnakeState {
+}): SnakeData<Apples, Bounds, Snake> {
   const bounds = createBounds({ width, height });
   const snakePart = getRandomItem(bounds);
 
@@ -77,7 +76,11 @@ export function getInitialSnakeState({
   };
 }
 
-export function addApple({ bounds, apples, snake }: SnakeState): Apples {
+export function addApple({
+  bounds,
+  apples,
+  snake,
+}: SnakeData<Apples, Bounds, Snake>): Apples {
   const apple = getApple({ apples, bounds, snake });
 
   if (!apple) {
@@ -87,7 +90,13 @@ export function addApple({ bounds, apples, snake }: SnakeState): Apples {
   return [...apples, apple];
 }
 
-export function moveSnake(snake: Snake, direction: Direction): Snake {
+export function moveSnake({
+  snake,
+  direction,
+}: {
+  snake: Snake;
+  direction: Direction;
+}): Snake {
   const head = snake[0];
   const newHead =
     direction === Direction.up

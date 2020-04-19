@@ -44,10 +44,24 @@ interface SnakeStateSchema extends StateSchema {
   };
 }
 
-export type SnakeContext<TApples, TBounds, TSnake> = {
+export type SnakeData<TApples, TBounds, TSnake> = {
   bounds: TBounds;
   apples: TApples;
   snake: TSnake;
+};
+
+export enum Direction {
+  up = 'up',
+  right = 'right',
+  down = 'down',
+  left = 'left',
+}
+
+type SnakeContext<TApples, TBounds, TSnake> = SnakeData<
+  TApples,
+  TBounds,
+  TSnake
+> & {
   nextDirection?: Direction;
 };
 
@@ -73,13 +87,6 @@ export type SnakeMachine<TApples, TBounds, TSnake> = Interpreter<
   SnakeStateSchema,
   SnakeEvent
 >;
-
-export enum Direction {
-  up = 'up',
-  right = 'right',
-  down = 'down',
-  left = 'left',
-}
 
 export type WillExceedBounds<TBounds, TSnake> = ({
   bounds,
@@ -119,7 +126,13 @@ export type GrowSnake<TApples, TSnake> = ({
   direction: Direction;
 }) => { apples: TApples; snake: TSnake };
 
-export type MoveSnake<TSnake> = (snake: TSnake, direction: Direction) => TSnake;
+export type MoveSnake<TSnake> = ({
+  snake,
+  direction,
+}: {
+  snake: TSnake;
+  direction: Direction;
+}) => TSnake;
 
 export function createSnakeMachine<TApples, TBounds, TSnake>({
   initialData,
@@ -128,18 +141,18 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
   willExceedBounds,
   willEatApple,
   willHitItself,
-  move,
-  grow,
+  moveSnake,
+  growSnake,
   onUpdate,
 }: {
-  initialData: SnakeContext<TApples, TBounds, TSnake>;
-  resetData: () => SnakeContext<TApples, TBounds, TSnake>;
-  updateApples: (context: SnakeContext<TApples, TBounds, TSnake>) => TApples;
+  initialData: SnakeData<TApples, TBounds, TSnake>;
+  resetData: () => SnakeData<TApples, TBounds, TSnake>;
+  updateApples: (data: SnakeData<TApples, TBounds, TSnake>) => TApples;
   willExceedBounds: WillExceedBounds<TBounds, TSnake>;
   willEatApple: WillEatApple<TApples, TSnake>;
   willHitItself: WillHitItself<TSnake>;
-  move: MoveSnake<TSnake>;
-  grow: GrowSnake<TApples, TSnake>;
+  moveSnake: MoveSnake<TSnake>;
+  growSnake: GrowSnake<TApples, TSnake>;
   onUpdate: ({
     apples,
     snake,
@@ -333,41 +346,42 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
         }),
 
         moveUp: assign({
-          snake: ({ snake }) => move(snake, Direction.up),
+          snake: ({ snake }) => moveSnake({ snake, direction: Direction.up }),
         }),
         moveRight: assign({
-          snake: ({ snake }) => move(snake, Direction.right),
+          snake: ({ snake }) =>
+            moveSnake({ snake, direction: Direction.right }),
         }),
         moveDown: assign({
-          snake: ({ snake }) => move(snake, Direction.down),
+          snake: ({ snake }) => moveSnake({ snake, direction: Direction.down }),
         }),
         moveLeft: assign({
-          snake: ({ snake }) => move(snake, Direction.left),
+          snake: ({ snake }) => moveSnake({ snake, direction: Direction.left }),
         }),
 
         growUp: assign({
           apples: ({ apples, snake }) =>
-            grow({ apples, snake, direction: Direction.up }).apples,
+            growSnake({ apples, snake, direction: Direction.up }).apples,
           snake: ({ apples, snake }) =>
-            grow({ apples, snake, direction: Direction.up }).snake,
+            growSnake({ apples, snake, direction: Direction.up }).snake,
         }),
         growRight: assign({
           apples: ({ apples, snake }) =>
-            grow({ apples, snake, direction: Direction.right }).apples,
+            growSnake({ apples, snake, direction: Direction.right }).apples,
           snake: ({ apples, snake }) =>
-            grow({ apples, snake, direction: Direction.right }).snake,
+            growSnake({ apples, snake, direction: Direction.right }).snake,
         }),
         growDown: assign({
           apples: ({ apples, snake }) =>
-            grow({ apples, snake, direction: Direction.down }).apples,
+            growSnake({ apples, snake, direction: Direction.down }).apples,
           snake: ({ apples, snake }) =>
-            grow({ apples, snake, direction: Direction.down }).snake,
+            growSnake({ apples, snake, direction: Direction.down }).snake,
         }),
         growLeft: assign({
           apples: ({ apples, snake }) =>
-            grow({ apples, snake, direction: Direction.left }).apples,
+            growSnake({ apples, snake, direction: Direction.left }).apples,
           snake: ({ apples, snake }) =>
-            grow({ apples, snake, direction: Direction.left }).snake,
+            growSnake({ apples, snake, direction: Direction.left }).snake,
         }),
 
         updateApples: assign({
