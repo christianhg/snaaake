@@ -171,6 +171,9 @@ export class Snaaake extends Component<
             </>
           )}
         </p>
+        <p className="src">
+          <a href="https://github.com/christianhg/snaaake">{'{src}'}</a>
+        </p>
       </div>
     );
   }

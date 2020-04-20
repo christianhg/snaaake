@@ -45,3 +45,11 @@ canvas {
   padding: 0.5em;
   margin: 0 auto 1.5em;
 }
+
+a {
+  color: #5c6370;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
