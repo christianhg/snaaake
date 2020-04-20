@@ -83,11 +83,7 @@ export function addApple({
 }: SnakeData<Apples, Bounds, Snake>): Apples {
   const apple = getApple({ apples, bounds, snake });
 
-  if (!apple) {
-    throw Error('Not enough room to create an apple');
-  }
-
-  return [...apples, apple];
+  return apple ? [...apples, apple] : apples;
 }
 
 export function moveSnake({
