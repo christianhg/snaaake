@@ -403,9 +403,10 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
           });
         },
 
-        reset: assign({
-          apples: ({ apples }) => resetData().apples,
-          snake: ({ snake }) => resetData().snake,
+        reset: assign(context => {
+          const { apples, snake } = resetData();
+
+          return { apples, snake };
         }),
       },
       guards: {
