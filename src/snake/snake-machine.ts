@@ -211,12 +211,10 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
               states: {
                 locked: {},
                 unlocked: {
-                  on: {
-                    '': [
-                      { cond: 'rightQueued', target: '#snake.moving.right' },
-                      { cond: 'leftQueued', target: '#snake.moving.left' },
-                    ],
-                  },
+                  always: [
+                    { cond: 'rightQueued', target: '#snake.moving.right' },
+                    { cond: 'leftQueued', target: '#snake.moving.left' },
+                  ],
                 },
               },
             },
@@ -241,12 +239,10 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
               states: {
                 locked: {},
                 unlocked: {
-                  on: {
-                    '': [
-                      { cond: 'upQueued', target: '#snake.moving.up' },
-                      { cond: 'downQueued', target: '#snake.moving.down' },
-                    ],
-                  },
+                  always: [
+                    { cond: 'upQueued', target: '#snake.moving.up' },
+                    { cond: 'downQueued', target: '#snake.moving.down' },
+                  ],
                 },
               },
             },
@@ -271,12 +267,10 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
               states: {
                 locked: {},
                 unlocked: {
-                  on: {
-                    '': [
-                      { cond: 'rightQueued', target: '#snake.moving.right' },
-                      { cond: 'leftQueued', target: '#snake.moving.left' },
-                    ],
-                  },
+                  always: [
+                    { cond: 'rightQueued', target: '#snake.moving.right' },
+                    { cond: 'leftQueued', target: '#snake.moving.left' },
+                  ],
                 },
               },
             },
@@ -301,12 +295,10 @@ export function createSnakeMachine<TApples, TBounds, TSnake>({
               states: {
                 locked: {},
                 unlocked: {
-                  on: {
-                    '': [
-                      { cond: 'upQueued', target: '#snake.moving.up' },
-                      { cond: 'downQueued', target: '#snake.moving.down' },
-                    ],
-                  },
+                  always: [
+                    { cond: 'upQueued', target: '#snake.moving.up' },
+                    { cond: 'downQueued', target: '#snake.moving.down' },
+                  ],
                 },
               },
             },
