@@ -1,5 +1,5 @@
 import { Direction, SnakeData } from './snake-machine';
-import { getRandomItem } from '../util/array';
+import { getRandomItem } from './util';
 
 type Tuple<A, B> = [A, B];
 export type Coords = Tuple<number, number>;
