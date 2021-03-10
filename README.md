@@ -24,7 +24,7 @@ All of the above is of course just for show.
 
 The real reason for Snaaake is to give the author a fun example to practice [XState](https://xstate.js.org/) on. Creating a game is a great opportunity to implement usages of:
 
-- [Context](https://xstate.js.org/docs/guides/context.html) (for external game)
+- [Context](https://xstate.js.org/docs/guides/context.html) (for extended game state)
 - [History](https://xstate.js.org/docs/guides/history.html) (for the pause functionality)
 - [Null Events](https://xstate.js.org/docs/guides/events.html#null-events) (to evaluate the game state on "ticks")
 
